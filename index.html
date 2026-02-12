@@ -47,18 +47,21 @@
             top: 0;
             left: 0;
             right: 0;
-            background: #000000;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             color: #ffffff;
-            padding: 8px 15px;
+            padding: 12px 20px;
             z-index: 10000;
             display: flex;
-            gap: 10px;
+            gap: 15px;
             align-items: center;
             justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-bottom: 1px solid #404040;
         }
 
         .admin-bar.hidden {
-            display: none;
+            transform: translateY(-100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body.admin-visible {
@@ -67,25 +70,84 @@
 
         .admin-controls {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .admin-btn {
-            padding: 6px 12px;
-            background: #ffffff;
-            color: #000000;
-            border: none;
+            padding: 8px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             cursor: pointer;
-            font-weight: bold;
-            font-size: 0.85em;
+            font-weight: 600;
+            font-size: 0.9em;
+            letter-spacing: 0.3px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .admin-btn:hover::before {
+            left: 100%;
         }
 
         .admin-btn:hover {
-            background: #e0e0e0;
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .admin-btn:active {
+            transform: translateY(0);
         }
 
         .admin-btn.active {
             background: #4ade80;
+            border-color: #4ade80;
+        }
+
+        .lock-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .lock-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .presentation-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .presentation-toggle label {
+            font-size: 0.9em;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .presentation-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
         }
 
         /* MODAL */
@@ -95,12 +157,23 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 10001;
             overflow-y: auto;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
 
         .modal.show {
@@ -109,58 +182,110 @@
 
         .modal-content {
             background: #ffffff;
-            border: 4px solid #000000;
-            padding: 30px;
+            border: 3px solid #000000;
+            padding: 35px;
             max-width: 1200px;
             width: 95%;
             max-height: 95vh;
             overflow-y: auto;
-            box-shadow: 8px 8px 0 #000000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             margin: 20px;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
             border-bottom: 3px solid #000000;
         }
 
         .modal-title {
-            font-size: 1.8em;
+            font-size: 2em;
             font-weight: bold;
+            letter-spacing: -0.5px;
         }
 
         .close-btn {
             background: #000000;
             color: #ffffff;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             cursor: pointer;
             font-weight: bold;
             font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #333333;
+            transform: scale(1.05);
+        }
+
+        .close-btn:active {
+            transform: scale(0.98);
         }
 
         .tabs {
             display: flex;
-            gap: 5px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #000000;
+            gap: 0;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e5e5e5;
+            overflow-x: auto;
         }
 
         .tab {
-            padding: 12px 24px;
-            background: #f0f0f0;
-            border: 2px solid #000000;
-            border-bottom: none;
+            padding: 14px 28px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 0.95em;
+            letter-spacing: 0.3px;
+            color: #666;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .tab::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #000000;
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab:hover {
+            color: #000000;
+            background: rgba(0, 0, 0, 0.02);
         }
 
         .tab.active {
-            background: #ffffff;
+            color: #000000;
+            background: transparent;
+        }
+
+        .tab.active::after {
+            transform: scaleX(1);
         }
 
         .tab-content {
@@ -172,18 +297,25 @@
         }
 
         .config-section {
-            margin-bottom: 25px;
-            border: 2px solid #000000;
-            padding: 20px;
-            background: #f9f9f9;
+            margin-bottom: 30px;
+            border: 2px solid #e5e5e5;
+            padding: 25px;
+            background: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        .config-section:hover {
+            border-color: #d0d0d0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .config-header {
             font-size: 1.3em;
             font-weight: bold;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
             border-bottom: 2px solid #000000;
+            letter-spacing: -0.3px;
         }
 
         .config-grid {
@@ -206,9 +338,24 @@
         .config-item input,
         .config-item textarea,
         .config-item select {
-            padding: 8px;
-            border: 2px solid #000000;
+            padding: 10px 12px;
+            border: 2px solid #e5e5e5;
             font-size: 0.95em;
+            transition: all 0.3s ease;
+        }
+
+        .config-item input:focus,
+        .config-item textarea:focus,
+        .config-item select:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-item input:hover,
+        .config-item textarea:hover,
+        .config-item select:hover {
+            border-color: #d0d0d0;
         }
 
         .config-item textarea {
@@ -237,7 +384,7 @@
         }
 
         .btn-save {
-            padding: 15px 30px;
+            padding: 16px 32px;
             background: #000000;
             color: #ffffff;
             border: none;
@@ -245,29 +392,77 @@
             font-weight: bold;
             font-size: 1.1em;
             width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-save::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-save:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-save:hover {
-            background: #333333;
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-save:active {
+            transform: translateY(0);
         }
 
         .btn-add {
-            padding: 12px 24px;
-            background: #4ade80;
-            color: #000000;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #000000 0%, #2d2d2d 100%);
+            color: #ffffff;
             border: 2px solid #000000;
             cursor: pointer;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-add:hover {
+            background: linear-gradient(135deg, #1a1a1a 0%, #404040 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-add:active {
+            transform: translateY(0);
         }
 
         .btn-remove {
-            padding: 8px 16px;
-            background: #ff4444;
+            padding: 10px 20px;
+            background: #ef4444;
             color: #ffffff;
             border: none;
             cursor: pointer;
             font-weight: bold;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-remove:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .btn-remove:active {
+            transform: scale(0.98);
         }
 
         /* LEADERBOARD */
@@ -291,11 +486,23 @@
             border: 2px solid #000000;
             padding: 12px;
             margin-bottom: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .team-card.rank-1 {
             background: #fff4e6;
             border: 3px solid #000000;
+        }
+
+        @keyframes slideInRank {
+            0% {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         .team-rank {
@@ -379,11 +586,32 @@
         }
 
         .btn {
-            padding: 10px 20px;
-            font-size: 1em;
+            padding: 14px 28px;
+            font-size: 1.1em;
             border: 2px solid #000000;
             cursor: pointer;
             font-weight: bold;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .btn:hover::after {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-primary {
@@ -391,9 +619,36 @@
             color: #ffffff;
         }
 
+        .btn-primary:hover {
+            background: #1a1a1a;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            background: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         .btn-success {
             background: #ffffff;
             color: #000000;
+        }
+
+        .btn-success:hover {
+            background: #f0f0f0;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-success:active {
+            transform: translateY(-1px);
         }
 
         /* TRADE ENTRY */
@@ -475,12 +730,13 @@
 
         .trade-row {
             display: grid;
-            grid-template-columns: 100px 100px 60px 80px 100px 100px;
+            grid-template-columns: 100px 100px 80px 70px 100px 100px;
             gap: 8px;
             padding: 8px;
             border-bottom: 1px solid #e5e5e5;
             font-size: 0.85em;
             font-family: 'Courier New', monospace;
+            background: #fafafa;
         }
 
         .trade-row.header {
@@ -490,9 +746,6 @@
             position: sticky;
             top: 0;
         }
-
-        .trade-row.buy { background: #f0f0f0; }
-        .trade-row.sell { background: #ffffff; }
 
         /* STOCK GRID */
         .stock-grid {
@@ -506,15 +759,27 @@
             border: 2px solid #000000;
             padding: 15px;
             box-shadow: 4px 4px 0 #000000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stock-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 #000000;
         }
 
         .stock-card.flash {
-            animation: flashCard 0.5s ease-in-out;
+            animation: flashCard 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @keyframes flashCard {
-            0%, 100% { background: #ffffff; }
-            50% { background: #f0f0f0; }
+            0%, 100% { 
+                background: #ffffff;
+                transform: scale(1);
+            }
+            50% { 
+                background: #f0f0f0;
+                transform: scale(1.02);
+            }
         }
 
         .mini-chart-container {
@@ -623,10 +888,21 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 9999;
+            animation: fadeInOverlay 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeInOverlay {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
 
         .flash-overlay.show {
@@ -638,13 +914,26 @@
             border: 4px solid #000000;
             padding: 40px;
             max-width: 800px;
-            box-shadow: 8px 8px 0 #000000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: slideUpNews 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUpNews {
+            from {
+                transform: translateY(30px) scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
         }
 
         .flash-company {
             font-size: 2em;
             font-weight: bold;
             margin-bottom: 20px;
+            letter-spacing: -0.5px;
         }
 
         .flash-text {
@@ -666,16 +955,18 @@
     <!-- Admin Bar -->
     <div class="admin-bar" id="adminBar">
         <div class="admin-controls">
-            <button class="admin-btn" onclick="openAdminConsole('teams')">👥 Teams</button>
-            <button class="admin-btn" onclick="openAdminConsole('drift')">📈 Drift</button>
-            <button class="admin-btn" onclick="openAdminConsole('news')">📰 News</button>
-            <button class="admin-btn" onclick="openAdminConsole('index')">📊 Index Fund</button>
-            <button class="admin-btn" onclick="openAdminConsole('engine')">⚙️ Engine</button>
+            <button class="admin-btn" onclick="openAdminConsole('teams')">Teams</button>
+            <button class="admin-btn" onclick="openAdminConsole('drift')">Drift</button>
+            <button class="admin-btn" onclick="openAdminConsole('news')">News</button>
+            <button class="admin-btn" onclick="openAdminConsole('index')">Index Fund</button>
+            <button class="admin-btn" onclick="openAdminConsole('engine')">Engine</button>
         </div>
         <div class="admin-controls">
-            <label style="color: #fff;">Presentation Mode:</label>
-            <input type="checkbox" id="presentationMode" onchange="togglePresentationMode()">
-            <button class="admin-btn" onclick="toggleAdminBar()">🔒 Lock & Hide</button>
+            <div class="presentation-toggle">
+                <label>Presentation Mode</label>
+                <input type="checkbox" id="presentationMode" onchange="togglePresentationMode()">
+            </div>
+            <button class="admin-btn lock-btn" onclick="toggleAdminBar()">Lock & Hide</button>
         </div>
     </div>
 
@@ -931,15 +1222,23 @@
                             <input type="number" id="tradePrice" placeholder="850" step="0.01">
                         </div>
                         <div>
-                            <button onclick="executeTrade()">Execute</button>
+                            <button onclick="executeTrade()">Place Order</button>
                         </div>
                     </div>
                     
+                    <!-- Order Book -->
+                    <div style="margin: 20px 0;">
+                        <div style="font-weight: bold; font-size: 1.1em; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #000;">📋 Pending Orders</div>
+                        <div id="orderBookContent" style="max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+                    
+                    <!-- Executed Trades -->
+                    <div style="font-weight: bold; font-size: 1.1em; margin: 15px 0 10px 0; padding-bottom: 8px; border-bottom: 2px solid #000;">✅ Executed Trades</div>
                     <div class="trades-log">
                         <div class="trade-row header">
-                            <div>Team</div>
+                            <div>Buyer</div>
+                            <div>Seller</div>
                             <div>Stock</div>
-                            <div>Side</div>
                             <div>Qty</div>
                             <div>Price</div>
                             <div>Time</div>
@@ -1061,6 +1360,28 @@
         let currentNewsIndex = 0;
         const SESSION_DURATION_MS = 15 * 60 * 1000;
         const MARKET_START_TIME = { hours: 9, minutes: 15 };
+
+        // Order Book System
+        let orderBook = {}; // { symbol: { buys: [], sells: [] } }
+        let orderIdCounter = 1;
+
+        function initOrderBook() {
+            stocks.forEach(s => {
+                orderBook[s.symbol] = { buys: [], sells: [] };
+            });
+            orderBook['NIFTY50'] = { buys: [], sells: [] };
+        }
+
+        // Indian number formatting (Lakhs/Crores)
+        function formatINR(num) {
+            const numStr = Math.round(num).toString();
+            const lastThree = numStr.substring(numStr.length - 3);
+            const otherNumbers = numStr.substring(0, numStr.length - 3);
+            if (otherNumbers !== '') {
+                return otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + "," + lastThree;
+            }
+            return lastThree;
+        }
 
         // ==================== ADMIN FUNCTIONS ====================
 
@@ -1456,21 +1777,41 @@
             })).sort((a, b) => b.netWorth - a.netWorth);
 
             const container = document.getElementById('leaderboardContent');
+            
+            // Store previous positions for animation
+            const previousPositions = {};
+            container.querySelectorAll('.team-card').forEach((card, idx) => {
+                const teamName = card.querySelector('.team-name')?.textContent;
+                if (teamName) previousPositions[teamName] = idx;
+            });
+            
             container.innerHTML = '';
 
             rankings.forEach((team, idx) => {
                 const card = document.createElement('div');
                 card.className = `team-card ${idx === 0 ? 'rank-1' : ''}`;
+                
                 const holdings = team.netWorth - team.cash;
+                
+                // Check if position changed
+                const prevPos = previousPositions[team.name];
+                const positionChanged = prevPos !== undefined && prevPos !== idx;
+                
                 card.innerHTML = `
                     <div class="team-rank">#${idx + 1}</div>
                     <div class="team-name">${team.name}</div>
                     <div class="team-stats">
-                        Cash: ₹${team.cash.toLocaleString()}<br>
-                        Holdings: ₹${holdings.toLocaleString()}
+                        Cash: ₹${formatINR(team.cash)}<br>
+                        Holdings: ₹${formatINR(holdings)}
                     </div>
-                    <div class="team-networth">₹${team.netWorth.toLocaleString()}</div>
+                    <div class="team-networth">₹${formatINR(team.netWorth)}</div>
                 `;
+                
+                // Add animation if position changed
+                if (positionChanged) {
+                    card.style.animation = 'slideInRank 0.5s ease-out';
+                }
+                
                 container.appendChild(card);
             });
         }
@@ -1483,9 +1824,9 @@
             document.getElementById('indexFundCard').innerHTML = `
                 <div class="index-card">
                     <div style="font-weight: bold; font-size: 1.1em; margin-bottom: 8px;">${indexFund.name}</div>
-                    <div style="font-size: 1.5em; font-weight: bold; font-family: 'Courier New';">${indexFund.value.toFixed(2)}</div>
+                    <div style="font-size: 1.5em; font-weight: bold; font-family: 'Courier New';">₹${indexFund.value.toFixed(2)}</div>
                     <div style="font-size: 0.9em; font-weight: bold; color: ${isPos ? '#000' : '#666'};">
-                        ${isPos ? '▲' : '▼'} ${Math.abs(change).toFixed(2)} (${isPos ? '+' : ''}${pct}%)
+                        ${isPos ? '▲' : '▼'} ₹${Math.abs(change).toFixed(2)} (${isPos ? '+' : ''}${pct}%)
                     </div>
                 </div>
             `;
@@ -1498,53 +1839,231 @@
             const qty = parseInt(document.getElementById('tradeQty').value);
             const price = parseFloat(document.getElementById('tradePrice').value);
 
-            if (!qty || qty <= 0 || !price || price <= 0) return alert('Invalid input!');
+            console.log('Execute Trade:', { team, symbol, side, qty, price });
+
+            if (!team) return alert('Please select a team!');
+            if (!symbol) return alert('Please select a stock!');
+            if (!qty || qty <= 0) return alert('Please enter a valid quantity!');
+            if (!price || price <= 0) return alert('Please enter a valid price!');
 
             const teamData = teams[team];
+            if (!teamData) return alert('Team not found!');
+            
             const value = qty * price;
 
-            // Validate trade
+            // Validate order (check if team has resources)
             if (side === 'BUY') {
-                if (teamData.cash < value) return alert('Insufficient cash!');
-                teamData.cash -= value;
-                teamData.holdings[symbol] = (teamData.holdings[symbol] || 0) + qty;
-            } else {
-                if ((teamData.holdings[symbol] || 0) < qty) return alert('Insufficient shares!');
-                teamData.cash += value;
-                teamData.holdings[symbol] -= qty;
-            }
-
-            // Record trade
-            tradeLog.unshift({ team, symbol, side, qty, price, value, timestamp: new Date() });
-
-            // Update price with market engine if enabled
-            if (symbol === 'NIFTY50') {
-                const impact = calculateMarketImpact(symbol, side, qty, price);
-                if (marketEngine.enabled) {
-                    indexFund.value *= (1 + impact);
-                } else {
-                    indexFund.value = price;
+                if (teamData.cash < value) {
+                    return alert(`Insufficient cash!\n\nTeam ${team} has: ₹${formatINR(teamData.cash)}\nNeeds: ₹${formatINR(value)}`);
                 }
-                updateIndexCard();
-                updateIndexStockCard();
             } else {
-                const stock = stocks.find(s => s.symbol === symbol);
-                if (stock) {
-                    const impact = calculateMarketImpact(symbol, side, qty, price);
-                    if (marketEngine.enabled) {
-                        stock.price *= (1 + impact);
-                    } else {
-                        stock.price = price;
-                    }
-                    updateStockCard(symbol);
+                const currentHoldings = teamData.holdings[symbol] || 0;
+                if (currentHoldings < qty) {
+                    return alert(`Insufficient shares!\n\nTeam ${team} has: ${currentHoldings} ${symbol}\nTrying to sell: ${qty}`);
                 }
             }
 
-            renderTradeLog();
-            updateLeaderboard();
+            // Create order
+            const order = {
+                id: orderIdCounter++,
+                team,
+                symbol,
+                side,
+                qty,
+                price,
+                timestamp: new Date()
+            };
 
+            console.log('Order created:', order);
+
+            // Add to order book
+            const book = orderBook[symbol];
+            if (!book) {
+                console.error('Order book not found for symbol:', symbol);
+                return alert('Error: Order book not initialized!');
+            }
+            
+            if (side === 'BUY') {
+                book.buys.push(order);
+                book.buys.sort((a, b) => b.price - a.price); // Highest price first
+            } else {
+                book.sells.push(order);
+                book.sells.sort((a, b) => a.price - b.price); // Lowest price first
+            }
+
+            console.log('Order added to book:', symbol, book);
+
+            // Try to match orders
+            matchOrders(symbol);
+
+            // Render order book
+            renderOrderBook();
+
+            // Clear form
             document.getElementById('tradeQty').value = '';
             document.getElementById('tradePrice').value = '';
+
+            // Check if order was filled or is pending
+            const stillPending = (side === 'BUY' && orderBook[symbol].buys.some(o => o.id === order.id)) ||
+                                 (side === 'SELL' && orderBook[symbol].sells.some(o => o.id === order.id));
+            
+            if (stillPending) {
+                const opposite = side === 'BUY' ? 'SELL' : 'BUY';
+                alert(`✅ ${side} order placed!\n\n${symbol}: ${qty} shares @ ₹${price.toFixed(2)}\n\nWaiting for ${opposite} order to match...`);
+            } else {
+                alert(`✅ Trade executed!\n\n${symbol}: ${qty} shares @ ₹${price.toFixed(2)}\n\nCheck Executed Trades below!`);
+            }
+        }
+
+        function matchOrders(symbol) {
+            const book = orderBook[symbol];
+            
+            while (book.buys.length > 0 && book.sells.length > 0) {
+                const buyOrder = book.buys[0];
+                const sellOrder = book.sells[0];
+
+                // Check if prices match (buy price >= sell price)
+                if (buyOrder.price < sellOrder.price) break;
+
+                // Match found! Execute trade
+                const tradeQty = Math.min(buyOrder.qty, sellOrder.qty);
+                const tradePrice = sellOrder.price; // Seller's price wins
+
+                // Execute the trade
+                const buyer = teams[buyOrder.team];
+                const seller = teams[sellOrder.team];
+                const tradeValue = tradeQty * tradePrice;
+
+                // Update buyer
+                buyer.cash -= tradeValue;
+                buyer.holdings[symbol] = (buyer.holdings[symbol] || 0) + tradeQty;
+
+                // Update seller
+                seller.cash += tradeValue;
+                seller.holdings[symbol] -= tradeQty;
+
+                // Log the trade
+                tradeLog.unshift({
+                    buyer: buyOrder.team,
+                    seller: sellOrder.team,
+                    symbol,
+                    qty: tradeQty,
+                    price: tradePrice,
+                    value: tradeValue,
+                    timestamp: new Date()
+                });
+
+                // Update stock price
+                if (symbol === 'NIFTY50') {
+                    const impact = calculateMarketImpact(symbol, 'BUY', tradeQty, tradePrice);
+                    if (marketEngine.enabled) {
+                        indexFund.value *= (1 + impact);
+                    } else {
+                        indexFund.value = tradePrice;
+                    }
+                    updateIndexCard();
+                    updateIndexStockCard();
+                } else {
+                    const stock = stocks.find(s => s.symbol === symbol);
+                    if (stock) {
+                        const impact = calculateMarketImpact(symbol, 'BUY', tradeQty, tradePrice);
+                        if (marketEngine.enabled) {
+                            stock.price *= (1 + impact);
+                        } else {
+                            stock.price = tradePrice;
+                        }
+                        updateStockCard(symbol);
+                    }
+                }
+
+                // Update order quantities or remove filled orders
+                buyOrder.qty -= tradeQty;
+                sellOrder.qty -= tradeQty;
+
+                if (buyOrder.qty === 0) book.buys.shift();
+                if (sellOrder.qty === 0) book.sells.shift();
+
+                // Update displays
+                renderTradeLog();
+                updateLeaderboard();
+            }
+        }
+
+        function cancelOrder(orderId, symbol, side) {
+            const book = orderBook[symbol];
+            const orders = side === 'BUY' ? book.buys : book.sells;
+            const index = orders.findIndex(o => o.id === orderId);
+            
+            if (index !== -1) {
+                orders.splice(index, 1);
+                renderOrderBook();
+                alert('Order cancelled');
+            }
+        }
+
+        function renderOrderBook() {
+            const container = document.getElementById('orderBookContent');
+            if (!container) return;
+            
+            let html = '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">';
+            
+            // Get all symbols with orders
+            const symbolsWithOrders = Object.keys(orderBook).filter(sym => 
+                orderBook[sym].buys.length > 0 || orderBook[sym].sells.length > 0
+            );
+
+            if (symbolsWithOrders.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">No pending orders - Place a BUY or SELL order to start trading</div>';
+                return;
+            }
+
+            symbolsWithOrders.forEach(symbol => {
+                const book = orderBook[symbol];
+                const canMatch = book.buys.length > 0 && book.sells.length > 0 && 
+                                 book.buys[0].price >= book.sells[0].price;
+                
+                html += `
+                    <div style="border: 2px solid ${canMatch ? '#4ade80' : '#000'}; padding: 12px; background: ${canMatch ? '#f0fdf4' : '#fff'};">
+                        <div style="font-weight: bold; font-size: 1.1em; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 8px;">
+                            ${symbol}
+                            ${canMatch ? '<span style="color: #16a34a; font-size: 0.8em; margin-left: 10px;">⚡ READY TO MATCH</span>' : ''}
+                        </div>
+                        
+                        ${book.sells.length > 0 ? `
+                            <div style="margin-bottom: 10px;">
+                                <div style="font-weight: bold; color: #dc2626; font-size: 0.9em; margin-bottom: 5px;">🔴 SELL Orders (${book.sells.length})</div>
+                                ${book.sells.map(o => `
+                                    <div style="background: #ffe6e6; padding: 6px; margin-bottom: 4px; font-size: 0.85em; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid #dc2626;">
+                                        <div>
+                                            <strong>${o.team}</strong><br>
+                                            <span style="font-family: 'Courier New';">${o.qty} shares @ ₹${o.price.toFixed(2)}</span>
+                                        </div>
+                                        <button onclick="cancelOrder(${o.id}, '${symbol}', 'SELL')" style="padding: 4px 8px; background: #dc2626; color: #fff; border: none; cursor: pointer; font-size: 0.8em; font-weight: bold;">✕</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<div style="color: #999; font-size: 0.85em; margin-bottom: 10px;">No SELL orders - Waiting for seller...</div>'}
+                        
+                        ${book.buys.length > 0 ? `
+                            <div>
+                                <div style="font-weight: bold; color: #16a34a; font-size: 0.9em; margin-bottom: 5px;">🟢 BUY Orders (${book.buys.length})</div>
+                                ${book.buys.map(o => `
+                                    <div style="background: #e6ffe6; padding: 6px; margin-bottom: 4px; font-size: 0.85em; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid #16a34a;">
+                                        <div>
+                                            <strong>${o.team}</strong><br>
+                                            <span style="font-family: 'Courier New';">${o.qty} shares @ ₹${o.price.toFixed(2)}</span>
+                                        </div>
+                                        <button onclick="cancelOrder(${o.id}, '${symbol}', 'BUY')" style="padding: 4px 8px; background: #16a34a; color: #fff; border: none; cursor: pointer; font-size: 0.8em; font-weight: bold;">✕</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<div style="color: #999; font-size: 0.85em;">No BUY orders - Waiting for buyer...</div>'}
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
         }
 
         function renderTradeLog() {
@@ -1554,11 +2073,11 @@
 
             tradeLog.slice(0, 30).forEach(trade => {
                 const row = document.createElement('div');
-                row.className = `trade-row ${trade.side.toLowerCase()}`;
+                row.className = 'trade-row';
                 row.innerHTML = `
-                    <div>${trade.team}</div>
+                    <div>${trade.buyer || trade.team}</div>
+                    <div>${trade.seller || '-'}</div>
                     <div>${trade.symbol}</div>
-                    <div>${trade.side}</div>
                     <div>${trade.qty}</div>
                     <div>₹${trade.price.toFixed(2)}</div>
                     <div>${trade.timestamp.toLocaleTimeString()}</div>
@@ -1568,9 +2087,11 @@
         }
 
         function exportTrades() {
-            let csv = "data:text/csv;charset=utf-8,Team,Symbol,Side,Qty,Price,Value,Time\n";
+            let csv = "data:text/csv;charset=utf-8,Buyer,Seller,Symbol,Qty,Price,Value,Time\n";
             tradeLog.forEach(t => {
-                csv += `${t.team},${t.symbol},${t.side},${t.qty},${t.price},${t.value},${t.timestamp.toISOString()}\n`;
+                const buyer = t.buyer || t.team;
+                const seller = t.seller || '-';
+                csv += `${buyer},${seller},${t.symbol},${t.qty},${t.price},${t.value},${t.timestamp.toISOString()}\n`;
             });
             const link = document.createElement("a");
             link.href = encodeURI(csv);
@@ -1579,9 +2100,11 @@
         }
 
         function clearTrades() {
-            if (confirm('Clear all trades?')) {
+            if (confirm('Clear all trades and orders?')) {
                 tradeLog = [];
+                initOrderBook();
                 renderTradeLog();
+                renderOrderBook();
             }
         }
 
@@ -1638,15 +2161,15 @@
             card.innerHTML = `
                 <div class="company-name">${indexFund.name}</div>
                 <div class="stock-symbol">${indexFund.symbol}</div>
-                <div class="current-price">${indexFund.value.toFixed(2)}</div>
+                <div class="current-price">₹${indexFund.value.toFixed(2)}</div>
                 <div class="price-change ${isPos ? 'positive' : 'negative'}">
-                    ${isPos ? '▲' : '▼'} ${Math.abs(change).toFixed(2)} (${isPos ? '+' : ''}${pct}%)
+                    ${isPos ? '▲' : '▼'} ₹${Math.abs(change).toFixed(2)} (${isPos ? '+' : ''}${pct}%)
                 </div>
                 <div class="mini-chart-container">
                     <canvas class="mini-chart" id="chart-NIFTY50"></canvas>
                 </div>
                 <div class="stats">
-                    <div><span class="stat-label">Open:</span> <span class="stat-value">${indexFund.open.toFixed(2)}</span></div>
+                    <div><span class="stat-label">Open:</span> <span class="stat-value">₹${indexFund.open.toFixed(2)}</span></div>
                     <div><span class="stat-label">Volume:</span> <span class="stat-value">${indexFund.volume}</span></div>
                 </div>
             `;
@@ -1662,9 +2185,9 @@
             const pct = ((change / indexFund.open) * 100).toFixed(2);
             const isPos = change >= 0;
 
-            card.querySelector('.current-price').textContent = indexFund.value.toFixed(2);
+            card.querySelector('.current-price').textContent = `₹${indexFund.value.toFixed(2)}`;
             card.querySelector('.price-change').className = `price-change ${isPos ? 'positive' : 'negative'}`;
-            card.querySelector('.price-change').textContent = `${isPos ? '▲' : '▼'} ${Math.abs(change).toFixed(2)} (${isPos ? '+' : ''}${pct}%)`;
+            card.querySelector('.price-change').textContent = `${isPos ? '▲' : '▼'} ₹${Math.abs(change).toFixed(2)} (${isPos ? '+' : ''}${pct}%)`;
 
             indexFund.history.push(indexFund.value);
             if (indexFund.history.length > 100) indexFund.history.shift();
@@ -1719,7 +2242,7 @@
             const last = points[points.length - 1];
             ctx.fillStyle = color;
             ctx.font = 'bold 10px Courier';
-            ctx.fillText(`${indexFund.value.toFixed(2)}`, width - 48, Math.max(12, Math.min(height - 4, last.y)));
+            ctx.fillText(`₹${indexFund.value.toFixed(2)}`, width - 48, Math.max(12, Math.min(height - 4, last.y)));
         }
 
         function updateStockCard(symbol) {
@@ -1938,6 +2461,10 @@
             allPriceAnimations.forEach(clearInterval);
             allPriceAnimations = [];
             
+            // Reset order book for new session
+            initOrderBook();
+            renderOrderBook();
+            
             document.getElementById('startBtn').disabled = false;
             document.getElementById('nextBtn').disabled = true;
             document.getElementById('skipBtn').disabled = true;
@@ -2001,17 +2528,28 @@
             
             indexFund.value += indexFund.value * (Math.random() - 0.5) * 0.002;
             updateIndexCard();
+            updateIndexStockCard();
+            
+            // Update leaderboard in real-time as prices change
+            updateLeaderboard();
         }, 3000);
 
+        // Additional real-time leaderboard update (faster for smoother position changes)
+        setInterval(() => {
+            updateLeaderboard();
+        }, 1000);
+
         // Initialize
+        initOrderBook();
         renderStocks();
         initializeTeamHoldings();
         updateIndexCard();
         renderTradeLog();
+        renderOrderBook();
     </script>
 
     <!-- To use external market engine, uncomment: -->
     <script src="market_engine.js"></script>
-    
+   
 </body>
 </html>
