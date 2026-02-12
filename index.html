@@ -1380,7 +1380,7 @@
                     marketEngine.enabled = 'external';
                     alert('External Market Engine ENABLED - Using market_engine.js');
                 } else {
-                    alert('⚠️ External engine not found!\n\nTo use external engine:\n1. Add market_engine.js to your folder\n2. Add <script src="market_engine.js"></script> before </body>');
+                    alert('⚠️ External engine not found!\n\nTo use external engine:\n1. Add market_engine.js to your folder\n2. Uncomment the script tag at bottom of index.html');
                     document.getElementById('engineEnabled').value = 'false';
                     marketEngine.enabled = false;
                 }
