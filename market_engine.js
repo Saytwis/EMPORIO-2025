@@ -4,14 +4,14 @@
 const MarketEngine = {
     // Stock configurations
     stockConfig: {
-        ADANIPORTS: { startPrice: 850.00, dailyVolume: 2_500_000, K: 1.05 },
-        LT: { startPrice: 3400.00, dailyVolume: 3_200_000, K: 1.00 },
-        JSWSTEEL: { startPrice: 820.00, dailyVolume: 8_500_000, K: 0.85 },
-        ONGC: { startPrice: 260.00, dailyVolume: 12_800_000, K: 0.75 },
-        TCS: { startPrice: 4100.00, dailyVolume: 1_800_000, K: 1.15 },
-        TITAN: { startPrice: 3600.00, dailyVolume: 2_800_000, K: 1.05 },
-        CEATLTD: { startPrice: 2800.00, dailyVolume: 680_000, K: 1.60 },
-        SBIN: { startPrice: 720.00, dailyVolume: 18_500_000, K: 0.70 }
+        ADANIPORTS: { startPrice: 850.00, dailyVolume: 2500000, K: 1.05 },
+        LT: { startPrice: 3400.00, dailyVolume: 3200000, K: 1.00 },
+        JSWSTEEL: { startPrice: 820.00, dailyVolume: 8500000, K: 0.85 },
+        ONGC: { startPrice: 260.00, dailyVolume: 12800000, K: 0.75 },
+        TCS: { startPrice: 4100.00, dailyVolume: 1800000, K: 1.15 },
+        TITAN: { startPrice: 3600.00, dailyVolume: 2800000, K: 1.05 },
+        CEATLTD: { startPrice: 2800.00, dailyVolume: 680000, K: 1.60 },
+        SBIN: { startPrice: 720.00, dailyVolume: 18500000, K: 0.70 }
     },
 
     // News sentiment by session
