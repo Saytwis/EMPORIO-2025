@@ -819,10 +819,10 @@
                     
                     <div style="margin: 15px 0; padding: 15px; background: #fff4e6; border: 2px solid #000;">
                         <strong>External Engine Instructions:</strong><br>
-                        1. Place <code>market_engine.js</code> in same folder as index.html<br>
+                        1. Place market_engine.js in same folder as index.html<br>
                         2. Select "External Engine" mode above<br>
                         3. The external engine will override built-in calculations<br>
-                        4. External engine must expose: <code>MarketEngine.calculateImpact(symbol, side, qty, price)</code>
+                        4. External engine must expose: MarketEngine.calculateImpact(symbol, side, qty, price)
                     </div>
 
                     <div class="config-header" style="margin-top: 20px;">Liquidity Coefficients (K)</div>
@@ -1008,15 +1008,15 @@
         const marketEngine = {
             enabled: false, // Toggle in admin console
             config: {
-                ADANIPORTS: { dailyVolume: 2_500_000, K: 1.05 },
-                LT: { dailyVolume: 3_200_000, K: 1.00 },
-                JSWSTEEL: { dailyVolume: 8_500_000, K: 0.85 },
-                ONGC: { dailyVolume: 12_800_000, K: 0.75 },
-                TCS: { dailyVolume: 1_800_000, K: 1.15 },
-                TITAN: { dailyVolume: 2_800_000, K: 1.05 },
-                CEATLTD: { dailyVolume: 680_000, K: 1.60 },
-                SBIN: { dailyVolume: 18_500_000, K: 0.70 },
-                NIFTY50: { dailyVolume: 50_000_000, K: 0.50 }
+                ADANIPORTS: { dailyVolume: 2500000, K: 1.05 },
+                LT: { dailyVolume: 3200000, K: 1.00 },
+                JSWSTEEL: { dailyVolume: 8500000, K: 0.85 },
+                ONGC: { dailyVolume: 12800000, K: 0.75 },
+                TCS: { dailyVolume: 1800000, K: 1.15 },
+                TITAN: { dailyVolume: 2800000, K: 1.05 },
+                CEATLTD: { dailyVolume: 680000, K: 1.60 },
+                SBIN: { dailyVolume: 18500000, K: 0.70 },
+                NIFTY50: { dailyVolume: 50000000, K: 0.50 }
             },
             params: {
                 depthFactor: 0.02,
@@ -1104,29 +1104,80 @@
             container.innerHTML = '';
 
             Object.entries(teams).forEach(([name, data], idx) => {
-                const div = document.createElement('div');
-                div.className = 'config-section';
-                div.innerHTML = `
-                    <div style="display: grid; grid-template-columns: 200px 150px 1fr auto; gap: 10px; margin-bottom: 15px; align-items: center;">
-                        <input type="text" value="${name}" id="team-name-${idx}" placeholder="Team Name" style="padding: 8px; border: 2px solid #000;">
-                        <input type="number" value="${data.cash}" id="team-cash-${idx}" placeholder="Cash" style="padding: 8px; border: 2px solid #000;">
-                        <div style="font-weight: bold;">Holdings:</div>
-                        <button class="btn-remove" onclick="removeTeam('${name}')">Remove</button>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <label style="font-size: 0.85em; font-weight: bold;">NIFTY50</label>
-                            <input type="number" value="${data.holdings['NIFTY50'] || 0}" id="team-${idx}-NIFTY50" style="padding: 6px; border: 1px solid #000;">
-                        </div>
-                        ${stocks.map(s => `
-                            <div style="display: flex; flex-direction: column; gap: 4px;">
-                                <label style="font-size: 0.85em; font-weight: bold;">${s.symbol}</label>
-                                <input type="number" value="${data.holdings[s.symbol] || 0}" id="team-${idx}-${s.symbol}" style="padding: 6px; border: 1px solid #000;">
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                container.appendChild(div);
+                const section = document.createElement('div');
+                section.className = 'config-section';
+                
+                // Header row
+                const header = document.createElement('div');
+                header.style = 'display: grid; grid-template-columns: 200px 150px 1fr auto; gap: 10px; margin-bottom: 15px; align-items: center;';
+                
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.value = name;
+                nameInput.id = `team-name-${idx}`;
+                nameInput.placeholder = 'Team Name';
+                nameInput.style = 'padding: 8px; border: 2px solid #000;';
+                
+                const cashInput = document.createElement('input');
+                cashInput.type = 'number';
+                cashInput.value = data.cash;
+                cashInput.id = `team-cash-${idx}`;
+                cashInput.placeholder = 'Cash';
+                cashInput.style = 'padding: 8px; border: 2px solid #000;';
+                
+                const holdingsLabel = document.createElement('div');
+                holdingsLabel.style.fontWeight = 'bold';
+                holdingsLabel.textContent = 'Holdings:';
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'btn-remove';
+                removeBtn.textContent = 'Remove';
+                removeBtn.onclick = () => removeTeam(name);
+                
+                header.appendChild(nameInput);
+                header.appendChild(cashInput);
+                header.appendChild(holdingsLabel);
+                header.appendChild(removeBtn);
+                
+                // Holdings grid
+                const holdingsGrid = document.createElement('div');
+                holdingsGrid.style = 'display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;';
+                
+                // NIFTY50
+                const niftyDiv = document.createElement('div');
+                niftyDiv.style = 'display: flex; flex-direction: column; gap: 4px;';
+                const niftyLabel = document.createElement('label');
+                niftyLabel.style = 'font-size: 0.85em; font-weight: bold;';
+                niftyLabel.textContent = 'NIFTY50';
+                const niftyInput = document.createElement('input');
+                niftyInput.type = 'number';
+                niftyInput.value = data.holdings['NIFTY50'] || 0;
+                niftyInput.id = `team-${idx}-NIFTY50`;
+                niftyInput.style = 'padding: 6px; border: 1px solid #000;';
+                niftyDiv.appendChild(niftyLabel);
+                niftyDiv.appendChild(niftyInput);
+                holdingsGrid.appendChild(niftyDiv);
+                
+                // Stocks
+                stocks.forEach(s => {
+                    const stockDiv = document.createElement('div');
+                    stockDiv.style = 'display: flex; flex-direction: column; gap: 4px;';
+                    const label = document.createElement('label');
+                    label.style = 'font-size: 0.85em; font-weight: bold;';
+                    label.textContent = s.symbol;
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.value = data.holdings[s.symbol] || 0;
+                    input.id = `team-${idx}-${s.symbol}`;
+                    input.style = 'padding: 6px; border: 1px solid #000;';
+                    stockDiv.appendChild(label);
+                    stockDiv.appendChild(input);
+                    holdingsGrid.appendChild(stockDiv);
+                });
+                
+                section.appendChild(header);
+                section.appendChild(holdingsGrid);
+                container.appendChild(section);
             });
         }
 
@@ -1180,12 +1231,33 @@
                     if (news) {
                         const div = document.createElement('div');
                         div.className = 'drift-grid';
-                        div.innerHTML = `
-                            <div style="font-weight: bold;">${stock.symbol}</div>
-                            <input type="number" step="0.1" value="${news.driftMin}" id="drift-${session}-${stock.symbol}-min">
-                            <input type="number" step="0.1" value="${news.driftMax}" id="drift-${session}-${stock.symbol}-max">
-                            <input type="number" step="0.1" value="${news.driftMid}" id="drift-${session}-${stock.symbol}-mid">
-                        `;
+                        
+                        const symbolDiv = document.createElement('div');
+                        symbolDiv.style.fontWeight = 'bold';
+                        symbolDiv.textContent = stock.symbol;
+                        
+                        const minInput = document.createElement('input');
+                        minInput.type = 'number';
+                        minInput.step = '0.1';
+                        minInput.value = news.driftMin;
+                        minInput.id = `drift-${session}-${stock.symbol}-min`;
+                        
+                        const maxInput = document.createElement('input');
+                        maxInput.type = 'number';
+                        maxInput.step = '0.1';
+                        maxInput.value = news.driftMax;
+                        maxInput.id = `drift-${session}-${stock.symbol}-max`;
+                        
+                        const midInput = document.createElement('input');
+                        midInput.type = 'number';
+                        midInput.step = '0.1';
+                        midInput.value = news.driftMid;
+                        midInput.id = `drift-${session}-${stock.symbol}-mid`;
+                        
+                        div.appendChild(symbolDiv);
+                        div.appendChild(minInput);
+                        div.appendChild(maxInput);
+                        div.appendChild(midInput);
                         container.appendChild(div);
                     }
                 });
@@ -1215,10 +1287,16 @@
                     if (news) {
                         const div = document.createElement('div');
                         div.className = 'config-item';
-                        div.innerHTML = `
-                            <label>${stock.name} (${stock.symbol})</label>
-                            <textarea id="news-${session}-${stock.symbol}">${news.news}</textarea>
-                        `;
+                        
+                        const label = document.createElement('label');
+                        label.textContent = `${stock.name} (${stock.symbol})`;
+                        
+                        const textarea = document.createElement('textarea');
+                        textarea.id = `news-${session}-${stock.symbol}`;
+                        textarea.value = news.news;
+                        
+                        div.appendChild(label);
+                        div.appendChild(textarea);
                         container.appendChild(div);
                     }
                 });
@@ -1932,8 +2010,7 @@
         renderTradeLog();
     </script>
 
-    <!-- OPTIONAL: Link external market engine here -->
-    <!-- Uncomment the line below to use market_engine.js -->
+    <!-- To use external market engine, uncomment: -->
     <script src="market_engine.js"></script>
     
 </body>
