@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EMPORIO 2026 - Live Board</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -221,6 +223,18 @@
     </style>
 </head>
 <body>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;">
+        <div style="text-align:center;color:#fff;max-width:400px;width:90%;">
+            <div style="font-size:2.5em;font-weight:bold;margin-bottom:5px;">EMPORIO 2026</div>
+            <div style="opacity:0.5;margin-bottom:40px;">Live Board</div>
+            <div style="text-align:left;margin-bottom:8px;font-size:0.9em;opacity:0.7;">Room Key</div>
+            <input type="text" id="roomKeyInput" placeholder="Enter room key..." style="width:100%;padding:14px 18px;font-size:1.1em;border:2px solid #444;background:#111;color:#fff;margin-bottom:20px;outline:none;" onkeydown="if(event.key==='Enter')joinRoom()">
+            <button onclick="joinRoom()" style="width:100%;padding:14px;background:#fff;color:#000;border:none;font-weight:bold;font-size:1.1em;cursor:pointer;">Connect</button>
+            <div style="margin-top:20px;font-size:0.8em;opacity:0.4;">Use the same key the admin used to connect</div>
+        </div>
+    </div>
+
     <div class="connection-bar waiting" id="connectionBar">⏳ Waiting for Admin to connect...</div>
 
     <div class="layout">
@@ -290,42 +304,59 @@
         let newsHistory = [];
         let currentSession = 1;
 
-        // ==================== BROADCAST CHANNEL ====================
-        const channel = new BroadcastChannel('emporio-2026');
+        // ==================== FIREBASE SYNC ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBJUPdflVt2VIe0apilNKNYmZhC1e2JsP4",
+            authDomain: "emporio-2026.firebaseapp.com",
+            databaseURL: "https://emporio-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "emporio-2026",
+            storageBucket: "emporio-2026.firebasestorage.app",
+            messagingSenderId: "502003603114",
+            appId: "1:502003603114:web:834d5f6e7d5f9fe22ba2d3"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const fbDb = firebase.database();
 
-        channel.onmessage = (e) => {
-            const msg = e.data;
+        function joinRoom() {
+            const key = document.getElementById('roomKeyInput').value.trim();
+            if (!key) return alert('Enter a room key!');
+            if (/[.#$/\[\]]/.test(key)) return alert('Room key cannot contain . # $ / [ ]');
+            document.getElementById('loginScreen').style.display = 'none';
 
-            if (msg.type === 'full-sync' || msg.type === 'state-update') {
-                // Update stocks
+            const roomRef = fbDb.ref('rooms/' + key);
+
+            // Listen for game state changes
+            roomRef.child('gameState').on('value', (snapshot) => {
+                const msg = snapshot.val();
+                if (!msg) return;
+
                 if (msg.stocks) {
                     msg.stocks.forEach(s => {
                         const local = stocks.find(ls => ls.symbol === s.symbol);
                         if (local) {
                             local.price = s.price;
                             local.open = s.open;
-                            local.priceHistory = s.priceHistory || local.priceHistory;
+                            if (s.name) local.name = s.name;
+                            if (s.volume) local.volume = s.volume;
                             local.priceHistory.push(s.price);
                             if (local.priceHistory.length > 100) local.priceHistory.shift();
                         }
                     });
                 }
-                // Update index
                 if (msg.indexFund) {
                     indexFund.value = msg.indexFund.value;
                     indexFund.open = msg.indexFund.open;
-                    indexFund.name = msg.indexFund.name || indexFund.name;
+                    if (msg.indexFund.name) indexFund.name = msg.indexFund.name;
+                    if (msg.indexFund.symbol) indexFund.symbol = msg.indexFund.symbol;
+                    if (msg.indexFund.volume) indexFund.volume = msg.indexFund.volume;
                     indexFund.history.push(msg.indexFund.value);
                     if (indexFund.history.length > 100) indexFund.history.shift();
                 }
-                // Update teams
                 if (msg.teams) teams = msg.teams;
-                // Update session
                 if (msg.currentSession) {
                     currentSession = msg.currentSession;
                     document.getElementById('sessionName').textContent = currentSession;
                 }
-                // Update clock
                 if (msg.clock) document.getElementById('marketClock').textContent = msg.clock;
                 if (msg.marketStatus) {
                     const el = document.getElementById('marketStatus');
@@ -333,57 +364,33 @@
                     el.className = 'market-status ' + msg.marketStatus.class;
                 }
 
-                // Re-render everything
                 renderAllStockCards();
                 updateIndexCard();
                 updateLeaderboard();
                 renderTeamHoldings();
 
-                // Connection status
                 document.getElementById('connectionBar').style.display = 'none';
                 document.body.style.paddingTop = '0';
                 document.querySelector('.layout').style.height = 'calc(100vh - 16px)';
-            }
+            });
 
-            if (msg.type === 'news-history') {
-                newsHistory = msg.newsHistory || [];
+            // Listen for news history
+            roomRef.child('newsHistory').on('value', (snapshot) => {
+                const data = snapshot.val();
+                newsHistory = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
                 renderNewsHistory();
-            }
+            });
 
-            if (msg.type === 'flash-news') {
-                showFlashNews(msg.company, msg.text);
-            }
-
-            if (msg.type === 'session-reset') {
-                if (msg.stocks) {
-                    msg.stocks.forEach(s => {
-                        const local = stocks.find(ls => ls.symbol === s.symbol);
-                        if (local) {
-                            local.price = s.price;
-                            local.open = s.open;
-                            local.priceHistory = [s.price];
-                        }
-                    });
+            // Listen for flash news
+            let lastFlashTimestamp = 0;
+            roomRef.child('flashNews').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.timestamp > lastFlashTimestamp) {
+                    lastFlashTimestamp = data.timestamp;
+                    showFlashNews(data.company, data.text);
                 }
-                if (msg.indexFund) {
-                    indexFund.value = msg.indexFund.value;
-                    indexFund.open = msg.indexFund.open;
-                    indexFund.history = [msg.indexFund.value];
-                }
-                if (msg.teams) teams = msg.teams;
-                currentSession = msg.currentSession || 1;
-                document.getElementById('sessionName').textContent = currentSession;
-                newsHistory = [];
-                renderNewsHistory();
-                renderAllStockCards();
-                updateIndexCard();
-                updateLeaderboard();
-                renderTeamHoldings();
-            }
-        };
-
-        // Request a sync on load
-        channel.postMessage({ type: 'request-sync' });
+            });
+        }
 
         // ==================== HELPERS ====================
         function formatINR(num) {
