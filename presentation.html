@@ -340,8 +340,9 @@
                 renderTeamHoldings();
 
                 // Connection status
-                document.getElementById('connectionBar').textContent = '🟢 Connected to Admin';
-                document.getElementById('connectionBar').className = 'connection-bar connected';
+                document.getElementById('connectionBar').style.display = 'none';
+                document.body.style.paddingTop = '0';
+                document.querySelector('.layout').style.height = 'calc(100vh - 16px)';
             }
 
             if (msg.type === 'news-history') {
