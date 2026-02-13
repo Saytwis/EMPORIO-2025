@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMPORIO 2025 - Admin Desk</title>
+    <title>EMPORIO 2026 - Admin Desk</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -263,7 +263,7 @@
     <!-- TOP BAR -->
     <div class="top-bar">
         <div class="top-bar-left">
-            <div class="top-bar-title">EMPORIO 2025 — Admin Desk</div>
+            <div class="top-bar-title">EMPORIO 2026 — Admin Desk</div>
             <div class="top-bar-session">Session <span id="sessionNum">1</span></div>
         </div>
         <div class="top-bar-right">
@@ -289,6 +289,7 @@
                 </div>
                 <div class="btns">
                     <button class="session-btn primary" id="startBtn" onclick="startSession()">▶ Start Session</button>
+                    <button class="session-btn secondary" id="pauseBtn" onclick="togglePause()" disabled>⏸ Pause</button>
                     <button class="session-btn secondary" id="skipBtn" onclick="skipToEnd()" disabled>⏭ Skip</button>
                     <button class="session-btn secondary" id="nextBtn" onclick="nextSession()" disabled>Next Session →</button>
                 </div>
@@ -493,6 +494,9 @@
 
         let currentSession = 1;
         let sessionStartTime = null;
+        let sessionPaused = false;
+        let sessionPausedAt = null;
+        let sessionElapsedBeforePause = 0;
         let marketClockInterval = null;
         let allPriceAnimations = [];
         let tradeLog = [];
@@ -505,7 +509,7 @@
         let orderIdCounter = 1;
 
         // ==================== BROADCAST CHANNEL ====================
-        const channel = new BroadcastChannel('emporio-2025');
+        const channel = new BroadcastChannel('emporio-2026');
 
         channel.onmessage = (e) => {
             if (e.data.type === 'request-sync') {
@@ -937,11 +941,46 @@
             }, 2000);
         }
 
+        function togglePause() {
+            if (!sessionStartTime && !sessionPaused) return;
+
+            if (!sessionPaused) {
+                // PAUSE
+                sessionPaused = true;
+                sessionElapsedBeforePause += Date.now() - sessionStartTime;
+                sessionStartTime = null;
+                stopMarketClock();
+                allPriceAnimations.forEach(clearInterval);
+                allPriceAnimations = [];
+
+                document.getElementById('pauseBtn').textContent = '▶ Resume';
+                document.getElementById('marketStatus').textContent = 'PAUSED';
+                document.getElementById('marketStatus').className = 'market-status-text closing';
+
+                broadcastStateUpdate();
+            } else {
+                // RESUME
+                sessionPaused = false;
+                sessionStartTime = Date.now() - sessionElapsedBeforePause;
+                startMarketClock();
+
+                document.getElementById('pauseBtn').textContent = '⏸ Pause';
+                document.getElementById('marketStatus').textContent = 'MARKET OPEN';
+                document.getElementById('marketStatus').className = 'market-status-text open';
+
+                broadcastStateUpdate();
+            }
+        }
+
         function startSession() {
             if (isFlashNewsRunning) return;
             isFlashNewsRunning = true;
+            sessionPaused = false;
+            sessionElapsedBeforePause = 0;
             document.getElementById('startBtn').disabled = true;
             document.getElementById('skipBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('pauseBtn').textContent = '⏸ Pause';
             sessionStartTime = Date.now();
             startMarketClock();
 
@@ -955,9 +994,11 @@
         }
 
         function skipToEnd() {
-            if (!sessionStartTime) return;
+            if (!sessionStartTime && !sessionPaused) return;
             allPriceAnimations.forEach(clearInterval); allPriceAnimations = [];
             sessionStartTime = null;
+            sessionPaused = false;
+            sessionElapsedBeforePause = 0;
 
             flashNewsData.filter(n => n.session === currentSession).forEach(item => {
                 const stock = stocks.find(s => s.symbol === item.company);
@@ -977,6 +1018,7 @@
             stopMarketClock();
             document.getElementById('nextBtn').disabled = false;
             document.getElementById('skipBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = true;
             renderPricesPanel();
             broadcastStateUpdate();
             channel.postMessage({ type: 'news-history', newsHistory: newsHistory.filter(n => n.session === currentSession) });
@@ -998,6 +1040,9 @@
             document.getElementById('startBtn').disabled = false;
             document.getElementById('nextBtn').disabled = true;
             document.getElementById('skipBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = true;
+            sessionPaused = false;
+            sessionElapsedBeforePause = 0;
             resetMarketClock();
             renderPricesPanel();
             broadcastSessionReset();
@@ -1015,7 +1060,7 @@
                 const status = document.getElementById('marketStatus');
                 if (progress < 0.9) { status.textContent = 'MARKET OPEN'; status.className = 'market-status-text open'; }
                 else if (progress < 1) { status.textContent = 'CLOSING SOON'; status.className = 'market-status-text closing'; }
-                else { status.textContent = 'MARKET CLOSED'; status.className = 'market-status-text closed'; stopMarketClock(); document.getElementById('nextBtn').disabled = false; document.getElementById('skipBtn').disabled = true; }
+                else { status.textContent = 'MARKET CLOSED'; status.className = 'market-status-text closed'; stopMarketClock(); document.getElementById('nextBtn').disabled = false; document.getElementById('skipBtn').disabled = true; document.getElementById('pauseBtn').disabled = true; }
             }, 100);
             setTimeout(() => stopMarketClock(), SESSION_DURATION_MS);
         }
@@ -1024,7 +1069,7 @@
 
         // Random fluctuations
         setInterval(() => {
-            if (!sessionStartTime || (Date.now() - sessionStartTime) >= SESSION_DURATION_MS) return;
+            if (!sessionStartTime || sessionPaused || (Date.now() - sessionStartTime) >= SESSION_DURATION_MS) return;
             stocks.forEach(stock => {
                 stock.price += stock.price * (Math.random() - 0.5) * 0.003;
                 if (stock.price < stock.open * 0.5) stock.price = stock.open * 0.5;
