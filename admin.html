@@ -1271,7 +1271,7 @@
             const companyName = isIdx ? indexFund.name : (stock?.name || item.company);
             broadcastFlashNews(companyName, item.news);
 
-            setTimeout(() => {
+            const tid = setTimeout(() => {
                 const drift = item.driftMin + Math.random() * (item.driftMax - item.driftMin);
 
                 if (isIdx) {
@@ -1304,6 +1304,7 @@
                 newsHistory.unshift({ company: companyName, news: item.news, time: new Date().toLocaleTimeString(), session: currentSession });
                 const _nr = dbRef('newsHistory'); if (_nr) _nr.set(newsHistory.filter(n => n.session === currentSession));
             }, 2000);
+            sessionTimeouts.push(tid);
         }
 
         function togglePause() {
@@ -1337,11 +1338,14 @@
             }
         }
 
+        let sessionTimeouts = []; // Track all session-related timeouts
+
         function startSession() {
             if (isFlashNewsRunning) return;
             isFlashNewsRunning = true;
             sessionPaused = false;
             sessionElapsedBeforePause = 0;
+            sessionTimeouts.forEach(clearTimeout); sessionTimeouts = [];
             document.getElementById('startBtn').disabled = true;
             document.getElementById('skipBtn').disabled = false;
             document.getElementById('pauseBtn').disabled = false;
@@ -1359,7 +1363,13 @@
             const news = flashNewsData.filter(n => n.session === currentSession);
             currentNewsIndex = 0;
             function showNext() {
-                if (currentNewsIndex < news.length) { showFlashNews(news[currentNewsIndex]); currentNewsIndex++; setTimeout(showNext, 3000); }
+                if (!isFlashNewsRunning) return; // bail if session was skipped
+                if (currentNewsIndex < news.length) {
+                    showFlashNews(news[currentNewsIndex]);
+                    currentNewsIndex++;
+                    const tid = setTimeout(showNext, 3000);
+                    sessionTimeouts.push(tid);
+                }
             }
             showNext();
             broadcastFullSync();
@@ -1368,9 +1378,11 @@
         function skipToEnd() {
             if (!sessionStartTime && !sessionPaused) return;
             allPriceAnimations.forEach(clearInterval); allPriceAnimations = [];
+            sessionTimeouts.forEach(clearTimeout); sessionTimeouts = [];
             sessionStartTime = null;
             sessionPaused = false;
             sessionElapsedBeforePause = 0;
+            isFlashNewsRunning = false;
 
             flashNewsData.filter(n => n.session === currentSession).forEach(item => {
                 const isIdx = item.isIndex || item.company === indexFund.symbol;
@@ -1401,12 +1413,14 @@
             document.getElementById('skipBtn').disabled = true;
             document.getElementById('pauseBtn').disabled = true;
             renderPricesPanel();
+            console.log('skipToEnd → Session', currentSession, 'Clock: 15:30', 'sessionActive:', !!sessionStartTime);
             broadcastStateUpdate();
             const _nr = dbRef('newsHistory'); if (_nr) _nr.set(newsHistory.filter(n => n.session === currentSession));
         }
 
         function nextSession() {
             currentSession++;
+            console.log('nextSession called → new session:', currentSession);
             if (currentSession > 3) {
                 currentSession = 1;
                 stocks.forEach(s => { s.price = s.open; s.priceHistory = [s.open]; });
@@ -1421,6 +1435,7 @@
             isFlashNewsRunning = false; currentNewsIndex = 0;
             newsHistory = newsHistory.filter(n => n.session !== currentSession);
             allPriceAnimations.forEach(clearInterval); allPriceAnimations = [];
+            sessionTimeouts.forEach(clearTimeout); sessionTimeouts = [];
             initOrderBook(); renderOrderBook();
             document.getElementById('startBtn').disabled = false;
             document.getElementById('nextBtn').disabled = true;
@@ -1514,6 +1529,7 @@
             });
         }
 
+        let marketClockTimeout = null;
         function startMarketClock() {
             marketClockInterval = setInterval(() => {
                 if (!sessionStartTime) return;
@@ -1528,9 +1544,12 @@
                 else if (progress < 1) { status.textContent = 'CLOSING SOON'; status.className = 'market-status-text closing'; }
                 else { status.textContent = 'MARKET CLOSED'; status.className = 'market-status-text closed'; stopMarketClock(); document.getElementById('nextBtn').disabled = false; document.getElementById('skipBtn').disabled = true; document.getElementById('pauseBtn').disabled = true; }
             }, 100);
-            setTimeout(() => stopMarketClock(), SESSION_DURATION_MS);
+            marketClockTimeout = setTimeout(() => stopMarketClock(), SESSION_DURATION_MS);
         }
-        function stopMarketClock() { if (marketClockInterval) { clearInterval(marketClockInterval); marketClockInterval = null; } }
+        function stopMarketClock() {
+            if (marketClockInterval) { clearInterval(marketClockInterval); marketClockInterval = null; }
+            if (marketClockTimeout) { clearTimeout(marketClockTimeout); marketClockTimeout = null; }
+        }
         function resetMarketClock() { sessionStartTime = null; document.getElementById('marketClock').textContent = '09:15'; document.getElementById('marketStatus').textContent = 'MARKET OPEN'; document.getElementById('marketStatus').className = 'market-status-text open'; }
 
         // Random fluctuations
