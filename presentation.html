@@ -100,14 +100,8 @@
             border: 2px solid #000000;
             padding: 10px;
             box-shadow: 3px 3px 0 #000000;
-            transition: all 0.3s;
         }
-        .stock-card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #000000; }
-        .stock-card.flash { animation: flashCard 0.6s; }
-        @keyframes flashCard {
-            0%, 100% { background: #ffffff; transform: scale(1); }
-            50% { background: #f0f0f0; transform: scale(1.02); }
-        }
+        .stock-card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #000000; transition: all 0.2s; }
         .company-name { font-size: 0.95em; font-weight: bold; }
         .stock-symbol { font-size: 0.75em; color: #666; }
         .current-price { font-size: 1.4em; font-weight: bold; font-family: 'Courier New', monospace; margin: 4px 0; }
@@ -170,12 +164,12 @@
         .macro-banner {
             background: #1a1a1a; color: #fff;
             padding: 10px 12px; margin-bottom: 8px;
-            border: 2px solid #000; border-left: 4px solid #ef4444;
+            border: 2px solid #333; border-left: 4px solid #ef4444;
         }
-        .macro-banner.session-3 { border-left-color: #dc2626; background: #1c0a0a; }
         .macro-banner-title {
             font-weight: bold; font-size: 0.9em;
-            margin-bottom: 6px; letter-spacing: 0.5px;
+            margin-bottom: 6px; letter-spacing: 1px;
+            text-transform: uppercase;
         }
         .macro-banner-item {
             font-size: 0.78em; padding: 2px 0;
@@ -326,6 +320,11 @@
                     el.className = 'market-status ' + msg.marketStatus.class;
                 }
 
+                // Track initial prices (session 1 opens) for total return
+                if (msg.initialPrices && Object.keys(initialPrices).length === 0) {
+                    initialPrices = msg.initialPrices;
+                }
+
                 // Update stock prices and index ONLY when session is NOT active
                 if (!msg.sessionActive) {
                     if (msg.stocks) {
@@ -372,7 +371,7 @@
                 const data = snapshot.val();
                 if (data && data.timestamp > lastFlashTimestamp) {
                     lastFlashTimestamp = data.timestamp;
-                    showFlashNews(data.company, data.text);
+                    showFlashNews(data.company, data.text, data.session || 1);
                 }
             });
 
@@ -381,10 +380,9 @@
                 const data = snapshot.val();
                 const banner = document.getElementById('macroNewsBanner');
                 if (!data) { banner.style.display = 'none'; return; }
-                const isS3 = data.session === 3;
-                let html = `<div class="macro-banner ${isS3 ? 'session-3' : ''}">`;
+                let html = '<div class="macro-banner">';
                 html += `<div class="macro-banner-title">${data.title}</div>`;
-                data.items.forEach(item => { html += `<div class="macro-banner-item">⚡ ${item}</div>`; });
+                data.items.forEach(item => { html += `<div class="macro-banner-item">• ${item}</div>`; });
                 html += '</div>';
                 banner.innerHTML = html;
                 banner.style.display = 'block';
@@ -436,6 +434,18 @@
             const pct = ((change / stock.open) * 100).toFixed(2);
             const isPos = change >= 0;
 
+            // Total return from session 1 open (only show after session 3 ends)
+            let totalReturnHtml = '';
+            const initPrice = initialPrices[symbol];
+            if (currentSession === 3 && initPrice) {
+                const totalChange = stock.price - initPrice;
+                const totalPct = ((totalChange / initPrice) * 100).toFixed(2);
+                const totalPos = totalChange >= 0;
+                totalReturnHtml = `<div style="margin-top:4px;padding-top:4px;border-top:2px solid #000;font-size:0.8em;font-weight:bold;font-family:'Courier New',monospace;color:${totalPos ? '#16a34a' : '#dc2626'};">
+                    TOTAL: ${totalPos ? '+' : ''}${totalPct}%
+                </div>`;
+            }
+
             card.innerHTML = `
                 <div class="company-name">${stock.name}</div>
                 <div class="stock-symbol">${stock.symbol}</div>
@@ -447,9 +457,8 @@
                     <div><span class="stat-label">Open:</span> <span class="stat-value">₹${stock.open.toFixed(2)}</span></div>
                     <div><span class="stat-label">Volume:</span> <span class="stat-value">${stock.volume}</span></div>
                 </div>
+                ${totalReturnHtml}
             `;
-            card.classList.add('flash');
-            setTimeout(() => card.classList.remove('flash'), 500);
         }
 
         function updateIndexStockCard() {
@@ -458,6 +467,17 @@
             const change = indexFund.value - indexFund.open;
             const pct = ((change / indexFund.open) * 100).toFixed(2);
             const isPos = change >= 0;
+
+            let totalReturnHtml = '';
+            const initPrice = initialPrices[indexFund.symbol];
+            if (currentSession === 3 && initPrice) {
+                const totalChange = indexFund.value - initPrice;
+                const totalPct = ((totalChange / initPrice) * 100).toFixed(2);
+                const totalPos = totalChange >= 0;
+                totalReturnHtml = `<div style="margin-top:4px;padding-top:4px;border-top:2px solid #000;font-size:0.8em;font-weight:bold;font-family:'Courier New',monospace;color:${totalPos ? '#16a34a' : '#dc2626'};">
+                    TOTAL: ${totalPos ? '+' : ''}${totalPct}%
+                </div>`;
+            }
 
             card.innerHTML = `
                 <div class="company-name">${indexFund.name}</div>
@@ -470,6 +490,7 @@
                     <div><span class="stat-label">Open:</span> <span class="stat-value">₹${indexFund.open.toFixed(2)}</span></div>
                     <div><span class="stat-label">Volume:</span> <span class="stat-value">${indexFund.volume}</span></div>
                 </div>
+                ${totalReturnHtml}
             `;
         }
 
@@ -512,11 +533,15 @@
             });
         }
 
-        function showFlashNews(company, text) {
+        let initialPrices = {}; // Tracks session 1 open prices for total return
+
+        function showFlashNews(company, text, session) {
             document.getElementById('flashCompany').textContent = company;
             document.getElementById('flashText').textContent = text;
             document.getElementById('flashOverlay').classList.add('show');
-            setTimeout(() => { document.getElementById('flashOverlay').classList.remove('show'); }, 2000);
+            // Session 1: 7s (longer news), Session 2&3: 5s (shorter news)
+            const duration = (session === 1) ? 7000 : 5000;
+            setTimeout(() => { document.getElementById('flashOverlay').classList.remove('show'); }, duration);
         }
 
         // Initial render (will show defaults until admin connects)
