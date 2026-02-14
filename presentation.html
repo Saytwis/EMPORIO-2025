@@ -232,8 +232,19 @@
             <div class="stock-grid" id="stockGrid"></div>
 
             <div class="team-holdings-section">
-                <div class="holdings-title">📋 Team Holdings</div>
-                <div id="teamHoldingsTable"></div>
+                <div class="holdings-title">Starting Portfolio (per team)</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.82em;">
+                    <div style="padding:6px 10px;background:#f0fdf4;border:1px solid #16a34a;">
+                        <div style="font-weight:bold;color:#16a34a;">Cash</div>
+                        <div style="font-family:'Courier New',monospace;font-size:1.1em;font-weight:bold;">₹10,00,000</div>
+                    </div>
+                    <div style="padding:6px 10px;background:#eff6ff;border:1px solid #2563eb;">
+                        <div style="font-weight:bold;color:#2563eb;">Holdings</div>
+                        <div style="font-size:0.85em;line-height:1.5;font-family:'Courier New',monospace;">
+                            GLOBALETF×2 · ADANI×100 · LT×25 · JSW×100 · ONGC×250 · TCS×22 · TITAN×25 · CEAT×25 · SBI×120 · AAPL×12 · MSFT×5 · TSLA×6 · AMZN×8 · NVDA×18 · META×3
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -350,7 +361,7 @@
 
                 // Always re-render everything
                 renderAllStockCards();
-                renderTeamHoldings();
+                
 
                 // Connection status - hide the bar
                 document.getElementById('connectionBar').style.display = 'none';
@@ -546,7 +557,7 @@
 
         // Initial render (will show defaults until admin connects)
         renderAllStockCards();
-        renderTeamHoldings();
+        
     </script>
 </body>
 </html>
