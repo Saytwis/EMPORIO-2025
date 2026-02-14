@@ -485,11 +485,16 @@
 
         // ==================== DATA ====================
         let teams = {
-            'Team A': { cash: 500000, holdings: {} },
-            'Team B': { cash: 500000, holdings: {} },
-            'Team C': { cash: 500000, holdings: {} },
-            'Team D': { cash: 500000, holdings: {} },
-            'Team E': { cash: 500000, holdings: {} }
+            'Team 1': { cash: 1000000, holdings: {} },
+            'Team 2': { cash: 1000000, holdings: {} },
+            'Team 3': { cash: 1000000, holdings: {} },
+            'Team 4': { cash: 1000000, holdings: {} },
+            'Team 5': { cash: 1000000, holdings: {} },
+            'Team 6': { cash: 1000000, holdings: {} },
+            'Team 7': { cash: 1000000, holdings: {} },
+            'Team 8': { cash: 1000000, holdings: {} },
+            'Team 9': { cash: 1000000, holdings: {} },
+            'Team 10': { cash: 1000000, holdings: {} }
         };
 
         const stocks = [
@@ -672,7 +677,11 @@
             db.ref('newsHistory').set([]);
             db.ref('flashNews').remove();
             db.ref('macroNews').remove();
-            db.ref('gameState').set(buildSyncPayload());
+            // Full state push with a slight delay to ensure all refs are cleared first
+            setTimeout(() => {
+                db.ref('gameState').set(buildSyncPayload());
+                flashSyncStatus();
+            }, 100);
         }
 
         function flashSyncStatus() {
@@ -942,9 +951,15 @@
 
         // ==================== GAME LOGIC ====================
         function initializeTeamHoldings() {
+            const defaultHoldings = {
+                GLOBALETF: 2, ADANIPORTS: 100, LT: 25, JSWSTEEL: 100, ONGC: 250,
+                TCS: 22, TITAN: 25, CEATLTD: 25, SBIN: 120,
+                AAPL: 12, MSFT: 5, TSLA: 6, AMZN: 8, NVDA: 18, META: 3
+            };
             Object.keys(teams).forEach(name => {
-                stocks.forEach(stock => { if (!teams[name].holdings[stock.symbol]) teams[name].holdings[stock.symbol] = Math.floor(50000 / stock.open); });
-                if (!teams[name].holdings['NIFTY50']) teams[name].holdings['NIFTY50'] = Math.floor(62500 / indexFund.open);
+                Object.entries(defaultHoldings).forEach(([sym, qty]) => {
+                    if (!teams[name].holdings[sym]) teams[name].holdings[sym] = qty;
+                });
             });
             updateTeamDropdown();
         }
@@ -1373,11 +1388,16 @@
 
             // Reset teams to defaults
             teams = {
-                'Team A': { cash: 500000, holdings: {} },
-                'Team B': { cash: 500000, holdings: {} },
-                'Team C': { cash: 500000, holdings: {} },
-                'Team D': { cash: 500000, holdings: {} },
-                'Team E': { cash: 500000, holdings: {} }
+                'Team 1': { cash: 1000000, holdings: {} },
+                'Team 2': { cash: 1000000, holdings: {} },
+                'Team 3': { cash: 1000000, holdings: {} },
+                'Team 4': { cash: 1000000, holdings: {} },
+                'Team 5': { cash: 1000000, holdings: {} },
+                'Team 6': { cash: 1000000, holdings: {} },
+                'Team 7': { cash: 1000000, holdings: {} },
+                'Team 8': { cash: 1000000, holdings: {} },
+                'Team 9': { cash: 1000000, holdings: {} },
+                'Team 10': { cash: 1000000, holdings: {} }
             };
             initializeTeamHoldings();
 
