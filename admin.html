@@ -521,55 +521,77 @@
         };
 
         let flashNewsData = [
-            // SESSION 1 - Indian
-            { session:1, company:'ADANIPORTS', news:'Adani Ports reported Q3 revenue of ₹7,980 crore (+13% YoY) with EBITDA margin at 50.1%, while net debt rose to ₹51,900 crore following ₹3,000 crore capex.', driftMin:-0.6, driftMax:0.8, driftMid:0.1 },
-            { session:1, company:'LT', news:'L&T recorded order inflows of ₹70,200 crore, taking its backlog to ₹4.66 lakh crore, though operating cash flow remained negative.', driftMin:-0.8, driftMax:0.9, driftMid:0.1 },
-            { session:1, company:'TITAN', news:'Titan posted 15% revenue growth to ₹11,150 crore with EBITDA margin at 12.8%, while inventory days increased to 159.', driftMin:-0.7, driftMax:1.0, driftMid:0.2 },
-            { session:1, company:'JSWSTEEL', news:'JSW Steel reported EBITDA of ₹6,080 crore (margin 18.9%), down 120 bps QoQ, even as net debt declined marginally.', driftMin:-1.6, driftMax:-0.4, driftMid:-1.0 },
-            { session:1, company:'ONGC', news:'ONGC realized $79/bbl crude with net profit up 8% YoY, though production volumes fell 2.5%.', driftMin:-1.0, driftMax:0.6, driftMid:-0.2 },
-            { session:1, company:'TCS', news:'TCS delivered ₹59,400 crore revenue (+8% YoY) with operating margin steady at 24.2%.', driftMin:0.6, driftMax:1.8, driftMid:1.2 },
-            { session:1, company:'CEATLTD', news:'CEAT revenue grew 9% YoY to ₹3,040 crore, but EBITDA margin contracted to 11.2% as finance costs rose 18%.', driftMin:-2.8, driftMax:-1.2, driftMid:-2.0 },
-            { session:1, company:'SBIN', news:'SBI reported NII of ₹41,500 crore (+17% YoY) with NIM at 3.42%.', driftMin:0.7, driftMax:1.9, driftMid:1.3 },
-            // SESSION 1 - US
-            { session:1, company:'AAPL', news:'Apple reported $124B quarterly revenue (+6% YoY) driven by Services hitting $26B, while iPhone revenue declined 2% in China.', driftMin:-0.5, driftMax:1.2, driftMid:0.4 },
-            { session:1, company:'MSFT', news:'Microsoft Azure revenue grew 29% YoY to $36B, beating estimates. AI-related cloud bookings exceeded $10B for the first time.', driftMin:0.8, driftMax:2.2, driftMid:1.5 },
-            { session:1, company:'TSLA', news:'Tesla delivered 495K vehicles in Q4, missing the 510K estimate. Margins compressed to 17.6% amid aggressive price cuts globally.', driftMin:-2.5, driftMax:-0.5, driftMid:-1.5 },
-            { session:1, company:'AMZN', news:'Amazon Web Services revenue grew 19% to $28B, while e-commerce operating margins improved to 5.8% from 3.2% last year.', driftMin:0.4, driftMax:1.6, driftMid:1.0 },
-            { session:1, company:'NVDA', news:'Nvidia reported data center revenue of $18.4B (+206% YoY) but guided for potential supply constraints on next-gen Blackwell chips.', driftMin:-1.0, driftMax:2.0, driftMid:0.5 },
-            { session:1, company:'META', news:'Meta reported $40B quarterly revenue (+25% YoY). Ad impressions up 28% while average price per ad rose 6%. Reality Labs lost $4.6B.', driftMin:-0.8, driftMax:1.5, driftMid:0.3 },
-            // SESSION 2 - Indian
-            { session:2, company:'ADANIPORTS', news:'The company approved ₹9,600 crore additional capex, projecting debt-to-EBITDA near 3.3x.', driftMin:-2.6, driftMax:-1.0, driftMid:-1.8 },
-            { session:2, company:'LT', news:'Net profit rose 20% to ₹3,460 crore including ₹610 crore exceptional gains, while working capital cycle extended to 118 days.', driftMin:-1.2, driftMax:0.8, driftMid:-0.2 },
-            { session:2, company:'TITAN', news:'Premium segment revenue rose 23% YoY, lifting EBITDA to ₹1,470 crore, though operating cash flow declined 15%.', driftMin:0.4, driftMax:1.6, driftMid:1.0 },
-            { session:2, company:'JSWSTEEL', news:'JSW Steel approved ₹8,000 crore expansion capex as interest expense increased 15% YoY.', driftMin:-2.2, driftMax:-0.8, driftMid:-1.5 },
-            { session:2, company:'ONGC', news:'ONGC declared ₹7/share interim dividend despite flat internal accruals and unchanged production guidance.', driftMin:-1.8, driftMax:-0.6, driftMid:-1.2 },
-            { session:2, company:'TCS', news:'TCS trimmed margin outlook by 40 bps to 23.8% while maintaining revenue growth guidance near 8%.', driftMin:-2.4, driftMax:-0.9, driftMid:-1.6 },
-            { session:2, company:'CEATLTD', news:'CEAT refinanced ₹1,200 crore debt at 8.2% average cost, while domestic volumes declined 2% sequentially.', driftMin:-1.0, driftMax:0.6, driftMid:-0.2 },
-            { session:2, company:'SBIN', news:'Cost-to-income ratio rose to 52.3%, while SME slippages stood at ₹4,100 crore during the quarter.', driftMin:-2.0, driftMax:-0.7, driftMid:-1.3 },
-            // SESSION 2 - US
-            { session:2, company:'AAPL', news:'Apple announced $110B buyback — largest in history. iPhone 16 AI features drove 12% upgrade cycle improvement in the US.', driftMin:0.6, driftMax:2.0, driftMid:1.3 },
-            { session:2, company:'MSFT', news:'Microsoft warned of $2B one-time charge related to EU antitrust ruling. Copilot enterprise adoption slowed to 8% seat conversion.', driftMin:-2.0, driftMax:-0.4, driftMid:-1.2 },
-            { session:2, company:'TSLA', news:'Tesla announced partnership with Saudi PIF for $8B Gigafactory. Robotaxi pilot approved in 3 US cities starting Q2.', driftMin:1.0, driftMax:3.0, driftMid:2.0 },
-            { session:2, company:'AMZN', news:'Amazon raised Prime membership fees by 15% across all tiers. Analysts project $3.2B incremental annual revenue.', driftMin:-1.2, driftMax:0.8, driftMid:-0.2 },
-            { session:2, company:'NVDA', news:'Nvidia lost $16B in market cap after reports of US tightening chip export rules to Middle East. China revenue fell 22%.', driftMin:-3.0, driftMax:-1.0, driftMid:-2.0 },
-            { session:2, company:'META', news:'Instagram Reels ad revenue surpassed YouTube Shorts for the first time. Threads MAU hit 250M, up 40% QoQ.', driftMin:0.8, driftMax:2.4, driftMid:1.6 },
-            // SESSION 3 - Indian
-            { session:3, company:'ADANIPORTS', news:'EBITDA margin held at 50.3%, though interest expense rose 21% YoY to ₹1,920 crore.', driftMin:-1.8, driftMax:-0.6, driftMid:-1.2 },
-            { session:3, company:'LT', news:'Execution revenue grew 12% YoY, but receivables rose to ₹68,400 crore, keeping FCF under pressure.', driftMin:-3.0, driftMax:-1.2, driftMid:-2.1 },
-            { session:3, company:'TITAN', news:'EBITDA margin remained near 13%, while inventory turnover declined to 2.3x.', driftMin:-2.8, driftMax:-1.0, driftMid:-1.9 },
-            { session:3, company:'JSWSTEEL', news:'Net debt reduced to ₹60,850 crore, even as export realizations softened 3% sequentially.', driftMin:0.4, driftMax:1.6, driftMid:1.0 },
-            { session:3, company:'ONGC', news:'Reserve replacement ratio stood at 0.94 while dividend payout remained above 45% of profit.', driftMin:-2.2, driftMax:-0.8, driftMid:-1.5 },
-            { session:3, company:'TCS', news:'Deal wins stood at $9.7 billion for the quarter, though revenue per employee declined 2.6%.', driftMin:-2.6, driftMax:-1.0, driftMid:-1.8 },
-            { session:3, company:'CEATLTD', news:'EBITDA margin improved to 11.8%, while working capital days increased to 64 from 58.', driftMin:-0.8, driftMax:0.8, driftMid:0.0 },
-            { session:3, company:'SBIN', news:'Loan growth reached 19% YoY, with provision coverage improving to 77%.', driftMin:0.3, driftMax:1.3, driftMid:0.8 },
-            // SESSION 3 - US
-            { session:3, company:'AAPL', news:'Apple Vision Pro sales fell 70% in Q4. Management cut Reality division headcount by 2,000. Focus shifts back to iPhone AI.', driftMin:-2.0, driftMax:-0.2, driftMid:-1.1 },
-            { session:3, company:'MSFT', news:'Azure secured $42B multi-year DoD cloud contract. GitHub Copilot surpassed 2M paid subscribers.', driftMin:0.5, driftMax:2.0, driftMid:1.2 },
-            { session:3, company:'TSLA', news:'Tesla Energy division revenue up 67% YoY to $8B. Megapack backlog now exceeds $12B through 2027.', driftMin:0.8, driftMax:2.5, driftMid:1.6 },
-            { session:3, company:'AMZN', news:'AWS suffered 47-minute outage affecting major enterprises. Three Fortune 500 clients began multi-cloud migration talks.', driftMin:-2.5, driftMax:-0.8, driftMid:-1.6 },
-            { session:3, company:'NVDA', news:'Nvidia unveiled next-gen Rubin architecture at GTC. Pre-orders from hyperscalers exceeded $30B within 48 hours.', driftMin:1.5, driftMax:3.5, driftMid:2.5 },
-            { session:3, company:'META', news:'EU fined Meta €1.8B for data transfer violations. Company announced plans to appeal, citing regulatory overreach.', driftMin:-2.8, driftMax:-1.0, driftMid:-1.9 }
+            // SESSION 1
+            { session:1, company:'GLOBALETF', news:'Global markets open positive after US inflation cooled from 3.4% to 3.1%. China announced a $120B infrastructure stimulus. Analysts expect moderate global recovery.', driftMin:-1.5, driftMax:4.0, driftMid:2.0, isIndex:true },
+            { session:1, company:'ADANIPORTS', news:'Cargo volume fell 2.8% this month, but long-term shipping contracts increased 6% YoY. Expansion in Southeast Asia continues.', driftMin:-3.0, driftMax:3.5, driftMid:1.0 },
+            { session:1, company:'LT', news:'Govt announced ₹18,000 Cr infra pipeline. L&T rumored to bid on at least 3 major metro projects.', driftMin:-1.0, driftMax:5.0, driftMid:2.5 },
+            { session:1, company:'JSWSTEEL', news:'Steel exports down 4%, but domestic demand up 3.2%. Iron ore prices rising slightly.', driftMin:-4.0, driftMax:3.0, driftMid:0.0 },
+            { session:1, company:'ONGC', news:'Crude oil holding near $79/barrel. Production output steady. Small refinery upgrade announced.', driftMin:-2.0, driftMax:3.0, driftMid:1.0 },
+            { session:1, company:'TCS', news:'New US tech contract worth $950M. However, hiring slowed by 8% this quarter.', driftMin:-2.0, driftMax:6.0, driftMid:2.5 },
+            { session:1, company:'TITAN', news:'Jewelry sales up 7% YoY, but gold prices surged 3% this week, raising input costs.', driftMin:-3.0, driftMax:4.0, driftMid:1.0 },
+            { session:1, company:'CEATLTD', news:'Rubber prices up 6% this quarter. Demand steady from auto sector.', driftMin:-5.0, driftMax:2.0, driftMid:-1.0 },
+            { session:1, company:'SBIN', news:'Loan growth up 9.4% YoY, NPAs slightly down. RBI policy uncertainty remains.', driftMin:-2.0, driftMax:5.0, driftMid:2.0 },
+            { session:1, company:'AAPL', news:'iPhone shipments up 5% globally, but China sales fell 3%.', driftMin:-2.0, driftMax:4.0, driftMid:2.0 },
+            { session:1, company:'MSFT', news:'Azure revenue up 11%, enterprise AI subscriptions growing fast.', driftMin:-1.0, driftMax:6.0, driftMid:3.0 },
+            { session:1, company:'TSLA', news:'Tesla cuts prices by 4% in Europe. Deliveries increased 2% QoQ.', driftMin:-6.0, driftMax:4.0, driftMid:-1.0 },
+            { session:1, company:'AMZN', news:'Online sales up 8%, logistics expansion into 2 new regions.', driftMin:-2.0, driftMax:5.0, driftMid:2.0 },
+            { session:1, company:'NVDA', news:'AI chip demand grew 18% this quarter, but analysts warn of overheating valuations.', driftMin:-3.0, driftMax:8.0, driftMid:4.0 },
+            { session:1, company:'META', news:'Ad revenue up 12%, Reality Labs losses widened by 9%.', driftMin:-2.0, driftMax:7.0, driftMid:3.0 },
+            // SESSION 2 — MACRO SHOCK
+            { session:2, company:'GLOBALETF', news:'Global markets mixed as inflation fears return.', driftMin:-4.0, driftMax:2.0, driftMid:-1.0, isIndex:true },
+            { session:2, company:'ADANIPORTS', news:'Fuel costs rising due to oil spike.', driftMin:-5.0, driftMax:2.0, driftMid:-2.0 },
+            { session:2, company:'LT', news:'Infrastructure funding delays rumored.', driftMin:-4.0, driftMax:3.0, driftMid:0.0 },
+            { session:2, company:'JSWSTEEL', news:'Metal demand uncertain amid slowdown fears.', driftMin:-6.0, driftMax:2.0, driftMid:-2.0 },
+            { session:2, company:'ONGC', news:'Oil rally boosts profits.', driftMin:-2.0, driftMax:7.0, driftMid:3.0 },
+            { session:2, company:'TCS', news:'US clients cutting IT budgets.', driftMin:-5.0, driftMax:2.0, driftMid:-1.0 },
+            { session:2, company:'TITAN', news:'Luxury demand slowing.', driftMin:-5.0, driftMax:2.0, driftMid:-2.0 },
+            { session:2, company:'CEATLTD', news:'Auto demand fears rising.', driftMin:-6.0, driftMax:1.0, driftMid:-3.0 },
+            { session:2, company:'SBIN', news:'Rate hike expectations help bank margins.', driftMin:-2.0, driftMax:5.0, driftMid:2.0 },
+            { session:2, company:'AAPL', news:'Higher rates pressure tech.', driftMin:-5.0, driftMax:2.0, driftMid:-2.0 },
+            { session:2, company:'MSFT', news:'AI still strong, but market nervous.', driftMin:-4.0, driftMax:3.0, driftMid:-1.0 },
+            { session:2, company:'TSLA', news:'EV demand concerns grow.', driftMin:-8.0, driftMax:3.0, driftMid:-3.0 },
+            { session:2, company:'AMZN', news:'Consumer spending slowdown fears.', driftMin:-5.0, driftMax:3.0, driftMid:-1.0 },
+            { session:2, company:'NVDA', news:'Profit booking after rally.', driftMin:-7.0, driftMax:4.0, driftMid:-2.0 },
+            { session:2, company:'META', news:'Ad spending fears.', driftMin:-6.0, driftMax:3.0, driftMid:-2.0 },
+            // SESSION 3 — FINAL CHAOS
+            { session:3, company:'GLOBALETF', news:'Global rally triggered by rate cut hopes.', driftMin:-2.0, driftMax:7.0, driftMid:4.0, isIndex:true },
+            { session:3, company:'ADANIPORTS', news:'Shipping demand rebounds.', driftMin:-3.0, driftMax:8.0, driftMid:4.0 },
+            { session:3, company:'LT', news:'Govt fast-tracks infra spending.', driftMin:-2.0, driftMax:9.0, driftMid:5.0 },
+            { session:3, company:'JSWSTEEL', news:'Metal demand optimism returns.', driftMin:-3.0, driftMax:8.0, driftMid:4.0 },
+            { session:3, company:'ONGC', news:'Oil crash hurts margins.', driftMin:-7.0, driftMax:2.0, driftMid:-3.0 },
+            { session:3, company:'TCS', news:'AI mega contract announced.', driftMin:-2.0, driftMax:10.0, driftMid:6.0 },
+            { session:3, company:'TITAN', news:'Festival demand surge.', driftMin:-3.0, driftMax:9.0, driftMid:5.0 },
+            { session:3, company:'CEATLTD', news:'Auto sector rebound.', driftMin:-2.0, driftMax:11.0, driftMid:6.0 },
+            { session:3, company:'SBIN', news:'Credit boom optimism.', driftMin:-2.0, driftMax:8.0, driftMid:5.0 },
+            { session:3, company:'AAPL', news:'New product rumors drive buying.', driftMin:-3.0, driftMax:9.0, driftMid:5.0 },
+            { session:3, company:'MSFT', news:'AI expansion deal announced.', driftMin:-2.0, driftMax:10.0, driftMid:6.0 },
+            { session:3, company:'TSLA', news:'Autonomous driving breakthrough rumor.', driftMin:-5.0, driftMax:12.0, driftMid:7.0 },
+            { session:3, company:'AMZN', news:'Cloud revenue surprise.', driftMin:-3.0, driftMax:9.0, driftMid:6.0 },
+            { session:3, company:'NVDA', news:'Huge institutional accumulation.', driftMin:-2.0, driftMax:14.0, driftMid:8.0 },
+            { session:3, company:'META', news:'Ad boom + cost cuts.', driftMin:-3.0, driftMax:10.0, driftMid:6.0 }
         ];
+
+        // Macro news for sessions 2 and 3
+        const macroNews = {
+            2: {
+                title: '🟠 MACRO SHOCK',
+                items: [
+                    'US inflation unexpectedly rises to 3.6%',
+                    'Oil jumps to $86/barrel',
+                    'Bond yields spike',
+                    'Tech stocks under pressure globally',
+                    'FIIs sell ₹4,000 Cr'
+                ]
+            },
+            3: {
+                title: '🔴 FINAL CHAOS',
+                items: [
+                    'Surprise: US Fed hints at possible rate cuts',
+                    'Oil suddenly drops to $74',
+                    'Massive institutional buying seen'
+                ]
+            }
+        };
 
         let currentSession = 1;
         let sessionStartTime = null;
@@ -649,6 +671,7 @@
         function broadcastSessionReset() {
             db.ref('newsHistory').set([]);
             db.ref('flashNews').remove();
+            db.ref('macroNews').remove();
             db.ref('gameState').set(buildSyncPayload());
         }
 
@@ -1145,13 +1168,28 @@
 
         // ==================== SESSION CONTROL ====================
         function showFlashNews(item) {
-            const stock = stocks.find(s => s.symbol === item.company);
-            const companyName = stock?.name || item.company;
+            const isIdx = item.isIndex || item.company === indexFund.symbol;
+            const stock = isIdx ? null : stocks.find(s => s.symbol === item.company);
+            const companyName = isIdx ? indexFund.name : (stock?.name || item.company);
             broadcastFlashNews(companyName, item.news);
 
             setTimeout(() => {
-                if (stock) {
-                    const drift = item.driftMin + Math.random() * (item.driftMax - item.driftMin);
+                const drift = item.driftMin + Math.random() * (item.driftMax - item.driftMin);
+
+                if (isIdx) {
+                    // Apply drift to index/ETF
+                    const impact = (indexFund.value * drift) / 100;
+                    const steps = Math.floor(SESSION_DURATION_MS / 2000);
+                    const inc = impact / steps;
+                    let step = 0;
+                    const anim = setInterval(() => {
+                        if (!sessionStartTime || step >= steps || (Date.now() - sessionStartTime) >= SESSION_DURATION_MS) { clearInterval(anim); return; }
+                        indexFund.value += inc;
+                        renderPricesPanel();
+                        step++;
+                    }, 2000);
+                    allPriceAnimations.push(anim);
+                } else if (stock) {
                     const impact = (stock.price * drift) / 100;
                     const steps = Math.floor(SESSION_DURATION_MS / 2000);
                     const inc = impact / steps;
@@ -1163,9 +1201,10 @@
                         step++;
                     }, 2000);
                     allPriceAnimations.push(anim);
-                    newsHistory.unshift({ company: companyName, news: item.news, time: new Date().toLocaleTimeString(), session: currentSession });
-                    db.ref('newsHistory').set(newsHistory.filter(n => n.session === currentSession));
                 }
+
+                newsHistory.unshift({ company: companyName, news: item.news, time: new Date().toLocaleTimeString(), session: currentSession });
+                db.ref('newsHistory').set(newsHistory.filter(n => n.session === currentSession));
             }, 2000);
         }
 
@@ -1212,6 +1251,13 @@
             sessionStartTime = Date.now();
             startMarketClock();
 
+            // Broadcast macro news for sessions 2 and 3
+            if (macroNews[currentSession]) {
+                db.ref('macroNews').set({ session: currentSession, ...macroNews[currentSession], timestamp: Date.now() });
+            } else {
+                db.ref('macroNews').remove();
+            }
+
             const news = flashNewsData.filter(n => n.session === currentSession);
             currentNewsIndex = 0;
             function showNext() {
@@ -1229,16 +1275,25 @@
             sessionElapsedBeforePause = 0;
 
             flashNewsData.filter(n => n.session === currentSession).forEach(item => {
-                const stock = stocks.find(s => s.symbol === item.company);
-                if (stock) {
-                    const drift = item.driftMin + Math.random() * (item.driftMax - item.driftMin);
-                    stock.price += (stock.price * drift) / 100;
-                    if (!newsHistory.some(h => h.company === (stocks.find(s=>s.symbol===item.company)?.name) && h.session === currentSession)) {
-                        newsHistory.unshift({ company: stock.name, news: item.news, time: new Date().toLocaleTimeString(), session: currentSession });
+                const isIdx = item.isIndex || item.company === indexFund.symbol;
+                const drift = item.driftMin + Math.random() * (item.driftMax - item.driftMin);
+
+                if (isIdx) {
+                    indexFund.value += (indexFund.value * drift) / 100;
+                    const companyName = indexFund.name;
+                    if (!newsHistory.some(h => h.company === companyName && h.session === currentSession)) {
+                        newsHistory.unshift({ company: companyName, news: item.news, time: new Date().toLocaleTimeString(), session: currentSession });
+                    }
+                } else {
+                    const stock = stocks.find(s => s.symbol === item.company);
+                    if (stock) {
+                        stock.price += (stock.price * drift) / 100;
+                        if (!newsHistory.some(h => h.company === stock.name && h.session === currentSession)) {
+                            newsHistory.unshift({ company: stock.name, news: item.news, time: new Date().toLocaleTimeString(), session: currentSession });
+                        }
                     }
                 }
             });
-            indexFund.value += (indexFund.value * indexFund.drift[currentSession]) / 100;
 
             document.getElementById('marketClock').textContent = '15:30';
             document.getElementById('marketStatus').textContent = 'MARKET CLOSED';
@@ -1258,6 +1313,10 @@
                 currentSession = 1;
                 stocks.forEach(s => { s.price = s.open; s.priceHistory = [s.open]; });
                 indexFund.value = indexFund.open; indexFund.history = [indexFund.open];
+            } else {
+                // Carry forward: current prices become the new open for next session
+                stocks.forEach(s => { s.open = s.price; s.priceHistory = [s.price]; });
+                indexFund.open = indexFund.value; indexFund.history = [indexFund.value];
             }
             document.getElementById('sessionName').textContent = currentSession;
             document.getElementById('sessionNum').textContent = currentSession;
@@ -1271,8 +1330,17 @@
             document.getElementById('pauseBtn').disabled = true;
             sessionPaused = false;
             sessionElapsedBeforePause = 0;
-            resetMarketClock();
+
+            // Reset clock to 09:15 and status to READY (not started yet)
+            sessionStartTime = null;
+            stopMarketClock();
+            document.getElementById('marketClock').textContent = '09:15';
+            document.getElementById('marketStatus').textContent = 'READY';
+            document.getElementById('marketStatus').className = 'market-status-text open';
+
             renderPricesPanel();
+            renderAdminHoldings();
+            // Sync with sessionActive = false so presentation updates prices
             broadcastSessionReset();
         }
 
