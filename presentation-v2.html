@@ -93,7 +93,7 @@
         .stock-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
+            gap: 10px;
         }
         .stock-card {
             background: #ffffff;
@@ -230,11 +230,6 @@
             </div>
 
             <div class="stock-grid" id="stockGrid"></div>
-
-            <div class="team-holdings-section">
-                <div class="holdings-title">📋 Team Holdings</div>
-                <div id="teamHoldingsTable"></div>
-            </div>
         </div>
 
         <!-- NEWS SIDEBAR -->
@@ -258,18 +253,13 @@
         const stocks = [
             { name: 'Adani Ports', symbol: 'ADANIPORTS', price: 850.00, open: 850.00, volume: '2.5M', priceHistory: [850.00] },
             { name: 'L&T', symbol: 'LT', price: 3400.00, open: 3400.00, volume: '3.2M', priceHistory: [3400.00] },
+            { name: 'SBI', symbol: 'SBIN', price: 720.00, open: 720.00, volume: '18.5M', priceHistory: [720.00] },
             { name: 'JSW Steel', symbol: 'JSWSTEEL', price: 820.00, open: 820.00, volume: '8.5M', priceHistory: [820.00] },
             { name: 'ONGC', symbol: 'ONGC', price: 260.00, open: 260.00, volume: '12.8M', priceHistory: [260.00] },
-            { name: 'TCS', symbol: 'TCS', price: 4100.00, open: 4100.00, volume: '1.8M', priceHistory: [4100.00] },
-            { name: 'Titan', symbol: 'TITAN', price: 3600.00, open: 3600.00, volume: '2.8M', priceHistory: [3600.00] },
-            { name: 'CEAT', symbol: 'CEATLTD', price: 2800.00, open: 2800.00, volume: '680K', priceHistory: [2800.00] },
-            { name: 'State Bank of India', symbol: 'SBIN', price: 720.00, open: 720.00, volume: '18.5M', priceHistory: [720.00] },
+            { name: 'Nvidia', symbol: 'NVDA', price: 9800.00, open: 9800.00, volume: '60M', priceHistory: [9800.00] },
             { name: 'Apple', symbol: 'AAPL', price: 12500.00, open: 12500.00, volume: '45M', priceHistory: [12500.00] },
             { name: 'Microsoft', symbol: 'MSFT', price: 31000.00, open: 31000.00, volume: '22M', priceHistory: [31000.00] },
-            { name: 'Tesla', symbol: 'TSLA', price: 25500.00, open: 25500.00, volume: '80M', priceHistory: [25500.00] },
-            { name: 'Amazon', symbol: 'AMZN', price: 15200.00, open: 15200.00, volume: '35M', priceHistory: [15200.00] },
-            { name: 'Nvidia', symbol: 'NVDA', price: 9800.00, open: 9800.00, volume: '60M', priceHistory: [9800.00] },
-            { name: 'Meta', symbol: 'META', price: 47000.00, open: 47000.00, volume: '18M', priceHistory: [47000.00] }
+            { name: 'TCS', symbol: 'TCS', price: 4100.00, open: 4100.00, volume: '1.8M', priceHistory: [4100.00] }
         ];
 
         let indexFund = {
@@ -350,7 +340,7 @@
 
                 // Always re-render everything
                 renderAllStockCards();
-                renderTeamHoldings();
+                
 
                 // Connection status - hide the bar
                 document.getElementById('connectionBar').style.display = 'none';
@@ -546,7 +536,7 @@
 
         // Initial render (will show defaults until admin connects)
         renderAllStockCards();
-        renderTeamHoldings();
+        
     </script>
 </body>
 </html>
