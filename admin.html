@@ -627,16 +627,19 @@
         firebase.initializeApp(firebaseConfig);
         const fbDb = firebase.database();
         let roomKey = null;
-        let db = null; // will be set to fbDb.ref('rooms/' + roomKey)
+        let roomRef = null;
+
+        function dbRef(path) {
+            if (!roomRef) { console.warn('Not connected to a room'); return null; }
+            return roomRef.child(path);
+        }
 
         function joinRoom() {
             const key = document.getElementById('roomKeyInput').value.trim();
             if (!key) return alert('Enter a room key!');
             if (/[.#$/\[\]]/.test(key)) return alert('Room key cannot contain . # $ / [ ]');
             roomKey = key;
-            db = {
-                ref: (path) => fbDb.ref('rooms/' + roomKey + '/' + path)
-            };
+            roomRef = fbDb.ref('rooms/' + roomKey);
             document.getElementById('loginScreen').style.display = 'none';
             // Push initial state to this room
             broadcastFullSync();
@@ -659,28 +662,35 @@
         }
 
         function broadcastFullSync() {
-            db.ref('gameState').set(buildSyncPayload());
-            db.ref('newsHistory').set(newsHistory.filter(n => n.session === currentSession));
+            const ref = dbRef('gameState'); if (!ref) return;
+            ref.set(buildSyncPayload()).catch(e => console.error('Sync error:', e));
+            const nRef = dbRef('newsHistory'); if (nRef) nRef.set(newsHistory.filter(n => n.session === currentSession)).catch(e => console.error(e));
             flashSyncStatus();
         }
 
         function broadcastStateUpdate() {
-            db.ref('gameState').set(buildSyncPayload());
+            const ref = dbRef('gameState'); if (!ref) return;
+            ref.set(buildSyncPayload()).catch(e => console.error('Update error:', e));
             flashSyncStatus();
         }
 
         function broadcastFlashNews(company, text) {
-            db.ref('flashNews').set({ company, text, timestamp: Date.now() });
+            const ref = dbRef('flashNews'); if (!ref) return;
+            ref.set({ company, text, timestamp: Date.now() }).catch(e => console.error(e));
         }
 
         function broadcastSessionReset() {
-            // Wipe session-specific data first, then push fresh state
-            const payload = buildSyncPayload();
-            db.ref('gameState').set(payload);
-            db.ref('newsHistory').set([]);
-            db.ref('flashNews').remove();
-            db.ref('macroNews').remove();
-            flashSyncStatus();
+            if (!roomRef) return;
+            // Use multi-path update so all writes happen atomically
+            const updates = {};
+            updates['gameState'] = buildSyncPayload();
+            updates['newsHistory'] = null;
+            updates['flashNews'] = null;
+            updates['macroNews'] = null;
+            roomRef.update(updates).then(() => {
+                flashSyncStatus();
+                console.log('Session reset synced:', updates.gameState.currentSession, updates.gameState.clock);
+            }).catch(e => console.error('Session reset error:', e));
         }
 
         function flashSyncStatus() {
@@ -1292,7 +1302,7 @@
                 }
 
                 newsHistory.unshift({ company: companyName, news: item.news, time: new Date().toLocaleTimeString(), session: currentSession });
-                db.ref('newsHistory').set(newsHistory.filter(n => n.session === currentSession));
+                const _nr = dbRef('newsHistory'); if (_nr) _nr.set(newsHistory.filter(n => n.session === currentSession));
             }, 2000);
         }
 
@@ -1341,9 +1351,9 @@
 
             // Broadcast macro news for sessions 2 and 3
             if (macroNews[currentSession]) {
-                db.ref('macroNews').set({ session: currentSession, ...macroNews[currentSession], timestamp: Date.now() });
+                const _mr = dbRef('macroNews'); if (_mr) _mr.set({ session: currentSession, ...macroNews[currentSession], timestamp: Date.now() });
             } else {
-                db.ref('macroNews').remove();
+                const _mrd = dbRef('macroNews'); if (_mrd) _mrd.remove();
             }
 
             const news = flashNewsData.filter(n => n.session === currentSession);
@@ -1392,7 +1402,7 @@
             document.getElementById('pauseBtn').disabled = true;
             renderPricesPanel();
             broadcastStateUpdate();
-            db.ref('newsHistory').set(newsHistory.filter(n => n.session === currentSession));
+            const _nr = dbRef('newsHistory'); if (_nr) _nr.set(newsHistory.filter(n => n.session === currentSession));
         }
 
         function nextSession() {
@@ -1428,6 +1438,9 @@
 
             renderPricesPanel();
             renderAdminHoldings();
+
+            console.log('nextSession → Session', currentSession, 'Clock:', document.getElementById('marketClock').textContent, 'sessionActive:', !!sessionStartTime);
+
             // Sync with sessionActive = false so presentation updates prices
             broadcastSessionReset();
         }
@@ -1495,7 +1508,7 @@
             renderAdminHoldings();
 
             // Wipe Firebase room and push fresh state
-            fbDb.ref('rooms/' + roomKey).set(null).then(() => {
+            roomRef.set(null).then(() => {
                 broadcastFullSync();
                 alert('✅ Full reset complete. Everything is back to defaults.');
             });
