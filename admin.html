@@ -674,14 +674,13 @@
         }
 
         function broadcastSessionReset() {
+            // Wipe session-specific data first, then push fresh state
+            const payload = buildSyncPayload();
+            db.ref('gameState').set(payload);
             db.ref('newsHistory').set([]);
             db.ref('flashNews').remove();
             db.ref('macroNews').remove();
-            // Full state push with a slight delay to ensure all refs are cleared first
-            setTimeout(() => {
-                db.ref('gameState').set(buildSyncPayload());
-                flashSyncStatus();
-            }, 100);
+            flashSyncStatus();
         }
 
         function flashSyncStatus() {
@@ -1116,15 +1115,89 @@
 
         function renderTradeLog() {
             const container = document.getElementById('tradesLogContent');
-            container.innerHTML = tradeLog.slice(0,30).map(t => `<div class="trade-row">
-                <div>${t.buyer}</div><div>${t.seller}</div><div>${t.symbol}</div><div>${t.qty}</div><div>₹${t.price.toFixed(2)}</div><div>${t.timestamp.toLocaleTimeString()}</div>
-            </div>`).join('');
+            if (tradeLog.length === 0) { container.innerHTML = '<div style="padding:15px;color:#999;text-align:center;">No trades yet</div>'; return; }
+
+            // Group by symbol
+            const grouped = {};
+            tradeLog.forEach(t => {
+                if (!grouped[t.symbol]) grouped[t.symbol] = [];
+                grouped[t.symbol].push(t);
+            });
+
+            let html = '';
+            Object.keys(grouped).forEach(symbol => {
+                const trades = grouped[symbol];
+                const stockName = stocks.find(s => s.symbol === symbol)?.name || (symbol === indexFund.symbol ? indexFund.name : symbol);
+                html += `<div style="background:#000;color:#fff;padding:5px 10px;font-weight:bold;font-size:0.85em;margin-top:6px;">${stockName} (${symbol}) — ${trades.length} trade${trades.length > 1 ? 's' : ''}</div>`;
+                trades.forEach(t => {
+                    html += `<div class="trade-row">
+                        <div>${t.buyer}</div><div>${t.seller}</div><div>${t.symbol}</div><div>${t.qty}</div><div>₹${t.price.toFixed(2)}</div><div>${t.timestamp.toLocaleTimeString()}</div>
+                    </div>`;
+                });
+            });
+            container.innerHTML = html;
         }
 
         function exportTrades() {
-            let csv = "data:text/csv;charset=utf-8,Buyer,Seller,Symbol,Qty,Price,Value,Time\n";
-            tradeLog.forEach(t => { csv += `${t.buyer},${t.seller},${t.symbol},${t.qty},${t.price},${t.value},${t.timestamp.toISOString()}\n`; });
-            const link = document.createElement("a"); link.href = encodeURI(csv); link.download = `trades_session_${currentSession}.csv`; link.click();
+            if (tradeLog.length === 0) return alert('No trades to export!');
+
+            // Group by symbol
+            const grouped = {};
+            tradeLog.forEach(t => {
+                if (!grouped[t.symbol]) grouped[t.symbol] = [];
+                grouped[t.symbol].push(t);
+            });
+
+            let csv = '';
+            const allSymbols = [indexFund.symbol, ...stocks.map(s => s.symbol)];
+
+            allSymbols.forEach(symbol => {
+                const trades = grouped[symbol];
+                if (!trades || trades.length === 0) return;
+                const stockName = stocks.find(s => s.symbol === symbol)?.name || (symbol === indexFund.symbol ? indexFund.name : symbol);
+
+                csv += `\n${stockName} (${symbol})\n`;
+                csv += 'Buyer,Seller,Qty,Price,Value,Time\n';
+                trades.forEach(t => {
+                    csv += `${t.buyer},${t.seller},${t.qty},${t.price.toFixed(2)},${t.value.toFixed(2)},${t.timestamp.toLocaleTimeString()}\n`;
+                });
+            });
+
+            // Add summary
+            csv += '\n\nSUMMARY\n';
+            csv += 'Stock,Total Trades,Total Volume,Total Value\n';
+            allSymbols.forEach(symbol => {
+                const trades = grouped[symbol];
+                if (!trades || trades.length === 0) return;
+                const totalQty = trades.reduce((s, t) => s + t.qty, 0);
+                const totalVal = trades.reduce((s, t) => s + t.value, 0);
+                csv += `${symbol},${trades.length},${totalQty},${totalVal.toFixed(2)}\n`;
+            });
+
+            // Add team holdings snapshot
+            csv += '\n\nTEAM HOLDINGS\n';
+            csv += 'Team,' + allSymbols.join(',') + ',Cash,Net Worth\n';
+            Object.keys(teams).forEach(name => {
+                const team = teams[name];
+                let nw = team.cash;
+                let row = name;
+                allSymbols.forEach(sym => {
+                    const qty = team.holdings[sym] || 0;
+                    if (sym === indexFund.symbol) nw += qty * indexFund.value;
+                    else { const s = stocks.find(st => st.symbol === sym); if (s) nw += qty * s.price; }
+                    row += ',' + qty;
+                });
+                row += ',' + team.cash.toFixed(2) + ',' + nw.toFixed(2);
+                csv += row + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `emporio_session_${currentSession}_trades.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
         }
 
         function clearTrades() { if (confirm('Clear all?')) { tradeLog = []; initOrderBook(); renderTradeLog(); renderOrderBook(); } }
